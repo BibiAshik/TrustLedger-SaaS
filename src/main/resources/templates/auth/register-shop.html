@@ -12,10 +12,137 @@
 </head>
 <body>
 
-    <div class="register-page">
-        <div class="register-card">
+    <!-- ===== HERO SECTION (Dark Background — uses dark logo) ===== -->
+    <section class="hero-section">
+
+        <!-- Navbar -->
+        <nav class="hero-navbar">
             <div class="logo">
-                <img src="/images/logo-light.png" alt="Trust Ledger">
+                <img src="/images/logo-dark.png" alt="Trust Ledger Logo">
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-outline" style="border-color: var(--gold); color: var(--gold-light);"
+                    onclick="openLoginModal()">Shop Owner Login</button>
+                <a href="/register" class="btn btn-gold">Register as Shop Owner</a>
+                <a href="/customer/login" class="btn btn-outline"
+                    style="border-color: var(--gold); color: var(--gold-light);">Customer Login</a>
+            </div>
+        </nav>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <h1>Digitize Your <span class="gold-text">Gold Loan</span> Business</h1>
+            <p class="hero-tagline">"Protect Gold. Preserve Trust."</p>
+            <p style="color: #E5E7EB; max-width: 600px; margin: 0 auto var(--space-8);">
+                The complete platform for local gold loan shops in India. Manage customers,
+                track loans, collect payments online, and send automated reminders — all from one dashboard.
+            </p>
+            <div class="hero-cta">
+                <a href="/register" class="btn btn-gold btn-lg">Register Your Shop</a>
+                <a href="/customer/login" class="btn btn-outline btn-lg"
+                    style="border-color: var(--gold); color: var(--gold-light);">Customer Portal</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WHY CHOOSE US SECTION ===== -->
+    <section class="features-section">
+        <h2>Why Choose <span class="text-gold">Trust Ledger</span>?</h2>
+        <p class="section-subtitle">Everything you need to run your gold loan shop digitally</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h4>Digital Records</h4>
+                <p>Replace handwritten registers with a structured digital system. Never lose a record again.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h4>Online Payments</h4>
+                <p>Customers pay interest online via UPI, cards, or net banking. Money goes directly to your bank.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h4>Auto Reminders</h4>
+                <p>Automated email and SMS reminders at Day 1, 7, 15, and 30 overdue. Never chase manually.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h4>Secure KYC</h4>
+                <p>Store Aadhaar and PAN details securely. Aadhaar numbers are always masked.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h4>Mobile Friendly</h4>
+                <p>Works perfectly on phones and tablets. Manage your shop from anywhere.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h4>PDF Receipts</h4>
+                <p>Auto-generated payment receipts and loan closure certificates. Professional and printable.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PLANS SECTION ===== -->
+    <section class="plans-section">
+        <h2>Simple, Transparent Pricing</h2>
+        <p class="section-subtitle">Choose the plan that fits your shop</p>
+
+        <div class="plans-grid">
+            <!-- Basic Plan -->
+            <div class="plan-card">
+                <h3>Basic</h3>
+                <div class="plan-price">₹299<span>/month</span></div>
+                <p class="text-muted text-sm">Everything you need to get started</p>
+                <ul class="plan-features">
+                    <li><span class="check">✓</span> Shop owner dashboard</li>
+                    <li><span class="check">✓</span> Add up to 100 customers</li>
+                    <li><span class="check">✓</span> Create & manage loans</li>
+                    <li><span class="check">✓</span> Record cash payments</li>
+                    <li><span class="check">✓</span> Automated email reminders</li>
+                    <li><span class="check">✓</span> Gold seizure warning flow</li>
+                    <li><span class="cross">✗</span> Customer login portal</li>
+                    <li><span class="cross">✗</span> Online payment collection</li>
+                    <li><span class="cross">✗</span> PDF receipt downloads</li>
+                </ul>
+                <a href="/register" class="btn btn-outline btn-block">Get Started</a>
+            </div>
+
+            <!-- Pro Plan (Recommended) -->
+            <div class="plan-card recommended">
+                <div class="plan-badge">Recommended</div>
+                <h3>Pro</h3>
+                <div class="plan-price">₹699<span>/month</span></div>
+                <p class="text-muted text-sm">Full power for growing shops</p>
+                <ul class="plan-features">
+                    <li><span class="check">✓</span> Everything in Basic</li>
+                    <li><span class="check">✓</span> Unlimited customers</li>
+                    <li><span class="check">✓</span> Customer login portal</li>
+                    <li><span class="check">✓</span> Customers view their loans</li>
+                    <li><span class="check">✓</span> Online payment via Razorpay</li>
+                    <li><span class="check">✓</span> Money direct to your bank</li>
+                    <li><span class="check">✓</span> PDF receipt downloads</li>
+                    <li><span class="check">✓</span> Customer payment history</li>
+                </ul>
+                <a href="/register" class="btn btn-gold btn-block">Start with Pro</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <p class="tagline">"Protect Gold. Preserve Trust."</p>
+        <p>© 2026 Trust Ledger. All rights reserved.</p>
+    </footer>
+
+    
+    <!-- ===== MODAL OVERLAY ===== -->
+    <div class="modal-overlay login-modal active">
+        <div class="modal modal-lg">
+            <button class="modal-close" onclick="window.location.href='/'">✕</button>
+            <div class="modal-logo">
+                <img src="/images/logo-dark.png" alt="Trust Ledger">
             </div>
             <h1>Register Your Shop</h1>
             <p class="subtitle">Join Trust Ledger and digitize your gold loan business</p>
@@ -197,15 +324,20 @@
                 </div>
 
                 <!-- Submit -->
-                <div class="form-actions">
-                    <a href="/" class="btn btn-outline-navy">← Back to Home</a>
-                    <button type="submit" class="btn btn-gold btn-lg">Register My Shop</button>
-                </div>
+                <button type="submit" class="btn btn-gold btn-lg">Register My Shop</button>
             </form>
         </div>
     </div>
-
-    <script src="/js/common.js"></script>
+<script src="/js/common.js"></script>
     <script src="/js/auth.js"></script>
+    <script>
+        // If user is already logged in, redirect to their dashboard
+        if (getToken()) {
+            var role = getRole();
+            if (role === 'ROLE_SUPER_ADMIN') window.location.href = '/admin/dashboard';
+            else if (role === 'ROLE_SHOP_OWNER') window.location.href = '/shop/dashboard';
+            else if (role === 'ROLE_CUSTOMER') window.location.href = '/customer/dashboard';
+        }
+    </script>
 </body>
 </html>

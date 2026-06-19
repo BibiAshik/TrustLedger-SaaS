@@ -16,12 +16,12 @@
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-brand">
-            <img src="/images/logo-light.png" alt="Trust Ledger">
+            <img src="/images/logo-dark.png" alt="Trust Ledger">
             <span>Admin Panel</span>
         </div>
         <div class="navbar-menu">
             <span class="text-sm text-muted">Super Admin</span>
-            <button onclick="logout()">Logout</button>
+            <button class="btn btn-outline" onclick="logout()">Logout</button>
         </div>
     </nav>
 
@@ -80,8 +80,8 @@
             // Action buttons
             var actionsHtml = '';
             if (shop.status === 'PENDING') {
-                actionsHtml = '<button class="btn btn-success" onclick="approveShop(' + shop.id + ')">✅ Approve</button> ' +
-                    '<button class="btn btn-danger" onclick="rejectShop(' + shop.id + ')">❌ Reject</button>';
+                actionsHtml = '<button class="btn btn-success" onclick="approveShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">✅ Approve</button> ' +
+                    '<button class="btn btn-danger" onclick="rejectShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">❌ Reject</button>';
             } else if (shop.status !== 'SUSPENDED') {
                 actionsHtml = '<button class="btn btn-danger" onclick="suspendShop(' + shop.id + ')">🚫 Suspend Shop</button>';
             }

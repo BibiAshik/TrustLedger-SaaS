@@ -12,13 +12,13 @@
 /* ===== CSS CUSTOM PROPERTIES (Design Tokens) ===== */
 :root {
     /* Primary Colors */
-    --cream: #FAF3E0;
-    --cream-dark: #F0E6C8;
+    --cream: #050506;
+    --cream-dark: #0a0a0d;
     --gold: #D4A017;
     --gold-light: #F5C518;
     --gold-dark: #B8860B;
-    --navy: #1A1A2E;
-    --navy-light: #2A2A4E;
+    --navy: #FFFFFF;
+    --navy-light: #E0E0E0;
 
     /* Secondary Colors */
     --blue: #5B8DEF;
@@ -27,25 +27,25 @@
 
     /* Status Colors */
     --success: #2ECC71;
-    --success-bg: #E8F8F0;
+    --success-bg: rgba(46, 204, 113, 0.15);
     --warning: #F39C12;
-    --warning-bg: #FFF8E1;
+    --warning-bg: rgba(243, 156, 18, 0.15);
     --danger: #E74C3C;
-    --danger-bg: #FDECEC;
+    --danger-bg: rgba(231, 76, 60, 0.15);
     --info: #3498DB;
-    --info-bg: #EBF5FB;
+    --info-bg: rgba(52, 152, 219, 0.15);
 
     /* Neutral Colors */
-    --white: #FFFFFF;
-    --gray-50: #F9FAFB;
-    --gray-100: #F3F4F6;
-    --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB;
-    --gray-400: #9CA3AF;
-    --gray-500: #6B7280;
-    --gray-600: #4B5563;
-    --gray-700: #374151;
-    --gray-800: #1F2937;
+    --white: #111116;
+    --gray-50: #1a1a24;
+    --gray-100: #22222d;
+    --gray-200: #2d2d3a;
+    --gray-300: #4B5563;
+    --gray-400: #6B7280;
+    --gray-500: #9CA3AF;
+    --gray-600: #D1D5DB;
+    --gray-700: #E5E7EB;
+    --gray-800: #F3F4F6;
 
     /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -409,76 +409,31 @@ p {
     text-decoration: none;
 }
 
-.btn-gold {
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: var(--navy);
-    box-shadow: var(--shadow-gold);
-}
-
-.btn-gold:hover {
-    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.35);
-}
-
-.btn-navy {
-    background: var(--navy);
-    color: var(--white);
-}
-
-.btn-navy:hover {
-    background: var(--navy-light);
-    transform: translateY(-1px);
-}
-
-.btn-blue {
-    background: var(--blue);
-    color: var(--white);
-}
-
-.btn-blue:hover {
-    background: var(--blue-dark);
-    transform: translateY(-1px);
-}
-
-.btn-outline {
-    background: transparent;
-    border: 2px solid var(--gold);
-    color: var(--gold-dark);
-}
-
-.btn-outline:hover {
-    background: var(--gold);
-    color: var(--navy);
-}
-
-.btn-outline-navy {
-    background: transparent;
-    border: 2px solid var(--navy);
-    color: var(--navy);
-}
-
-.btn-outline-navy:hover {
-    background: var(--navy);
-    color: var(--white);
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: var(--white);
-}
-
-.btn-danger:hover {
-    background: #C0392B;
-}
-
+.btn-gold,
+.btn-navy,
+.btn-blue,
+.btn-outline,
+.btn-outline-navy,
+.btn-danger,
 .btn-success {
-    background: var(--success);
-    color: var(--white);
+    background: #050506;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    box-shadow: none;
 }
 
+.btn-gold:hover,
+.btn-navy:hover,
+.btn-blue:hover,
+.btn-outline:hover,
+.btn-outline-navy:hover,
+.btn-danger:hover,
 .btn-success:hover {
-    background: #27AE60;
+    background: #111116;
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212, 160, 23, 0.15);
 }
 
 .btn-sm {
@@ -577,9 +532,9 @@ p {
     left: 0;
     right: 0;
     height: var(--navbar-height);
-    background: rgba(255, 255, 255, 0.96);
-    border-bottom: 1px solid rgba(26, 26, 46, 0.08);
-    box-shadow: 0 8px 24px rgba(26, 26, 46, 0.06);
+    background: rgba(5, 5, 6, 0.96);
+    border-bottom: 1px solid var(--gray-200);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     padding: 0 var(--space-8);
@@ -613,7 +568,7 @@ p {
 }
 
 .navbar-menu a,
-.navbar-menu button {
+.navbar-menu button:not(.btn) {
     color: var(--gray-600);
     font-weight: 500;
     font-size: var(--font-size-sm);
@@ -624,7 +579,7 @@ p {
 }
 
 .navbar-menu a:hover,
-.navbar-menu button:hover {
+.navbar-menu button:not(.btn):hover {
     color: var(--gold);
 }
 
@@ -641,23 +596,16 @@ p {
     left: 0;
     bottom: 0;
     width: var(--sidebar-width);
-    background: linear-gradient(180deg, #ffffff 0%, #fffdf7 100%);
-    border-right: 1px solid rgba(212, 160, 23, 0.16);
-    box-shadow: 12px 0 30px rgba(26, 26, 46, 0.04);
+    background: #0a0a0d;
+    border-right: 1px solid var(--gray-200);
+    box-shadow: 12px 0 30px rgba(0, 0, 0, 0.2);
     padding: var(--space-6) 0;
-    overflow-y: auto;
     z-index: 900;
     transition: transform var(--transition-normal);
 }
 
 .sidebar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: -1px;
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(180deg, transparent, rgba(212, 160, 23, 0.24), transparent);
+    display: none;
 }
 
 .sidebar-nav {
@@ -671,7 +619,7 @@ p {
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    padding: var(--space-2) var(--space-4);
     color: var(--gray-600);
     font-weight: 500;
     font-size: var(--font-size-sm);
@@ -680,15 +628,15 @@ p {
 }
 
 .sidebar-nav a:hover {
-    background: var(--cream);
-    color: var(--gold-dark);
+    background: var(--gray-100);
+    color: var(--gold);
 }
 
 .sidebar-nav a.active {
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: var(--navy);
+    background: rgba(212, 160, 23, 0.1);
+    color: var(--gold);
     font-weight: 600;
-    box-shadow: var(--shadow-gold);
+    border: 1px solid var(--gold);
 }
 
 .sidebar-nav a .nav-icon {
@@ -712,7 +660,7 @@ p {
     margin-left: var(--sidebar-width);
     padding: var(--space-8);
     min-height: calc(100vh - var(--navbar-height));
-    background: linear-gradient(180deg, rgba(250, 243, 224, 0.96), var(--cream));
+    background: var(--cream);
 }
 
 .sidebar-toggle {
@@ -822,9 +770,22 @@ p {
     background: rgba(26, 26, 46, 0.6);
     backdrop-filter: blur(4px);
     z-index: 2000;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: var(--space-4);
+    overflow-y: auto;
+}
+
+/* Custom Webkit Scrollbar for Modals */
+.modal-overlay::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-overlay::-webkit-scrollbar-track {
+    background: transparent;
+}
+.modal-overlay::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 4px;
 }
 
 .modal-overlay.active {
@@ -832,14 +793,20 @@ p {
 }
 
 .modal {
-    background: var(--white);
+    background: #0a0a0d;
+    border: 1px solid var(--gold);
     border-radius: var(--radius-xl);
     padding: var(--space-8);
     width: 100%;
     max-width: 440px;
+    margin: var(--space-8) auto;
     box-shadow: var(--shadow-xl);
     position: relative;
     animation: modalSlideIn 0.3s ease;
+}
+
+.modal-lg {
+    max-width: 650px;
 }
 
 @keyframes modalSlideIn {
@@ -968,7 +935,7 @@ p {
 .badge {
     display: inline-flex;
     align-items: center;
-    padding: 3px 10px;
+    padding: 4px 12px;
     border-radius: var(--radius-xl);
     font-size: var(--font-size-xs);
     font-weight: 600;
@@ -978,34 +945,30 @@ p {
 
 .badge-active,
 .badge-approved {
-    background: var(--success-bg);
-    color: #155724;
+    background: #2ECC71;
+    color: #050506;
 }
 
 .badge-pending {
-    background: var(--warning-bg);
-    color: #856404;
+    background: #F39C12;
+    color: #050506;
 }
 
 .badge-overdue,
-.badge-expired {
-    background: var(--danger-bg);
-    color: #721C24;
+.badge-expired,
+.badge-suspended {
+    background: #E74C3C;
+    color: #FFFFFF;
 }
 
 .badge-closed {
-    background: var(--info-bg);
-    color: #0C5460;
+    background: #3498DB;
+    color: #FFFFFF;
 }
 
 .badge-seized {
-    background: #2D2D2D;
-    color: #F8F8F8;
-}
-
-.badge-suspended {
-    background: var(--danger-bg);
-    color: #721C24;
+    background: #8B0000;
+    color: #FFFFFF;
 }
 
 .badge-basic {
@@ -1083,8 +1046,13 @@ p {
     border: 2px solid var(--gray-200);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
+    color: #FFFFFF;
     transition: border-color var(--transition-fast);
     background: var(--white);
+}
+
+.search-bar input::placeholder {
+    color: var(--gray-400);
 }
 
 .search-bar input:focus {

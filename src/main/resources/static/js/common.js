@@ -44,8 +44,13 @@ function getRole() {
  * Clears all auth data and redirects to the homepage.
  */
 function logout() {
+    var role = getRole();
     clearAuth();
-    window.location.href = '/';
+    if (role === 'ROLE_SUPER_ADMIN') {
+        window.location.href = '/admin/login';
+    } else {
+        window.location.href = '/';
+    }
 }
 
 function clearAuth() {

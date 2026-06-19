@@ -471,7 +471,9 @@ function renderShopList(pageData, isPending) {
             '<td data-label="Plan"><span class="badge badge-' + (shop.plan || 'basic').toLowerCase() + '">' + (shop.plan || 'BASIC') + '</span></td>' +
             '<td data-label="Status">' + getStatusBadge(shop.status) + '</td>' +
             '<td data-label="Registered">' + formatDate(shop.createdAt) + '</td>' +
-            '<td><a href="/admin/shops/' + shop.id + '" class="btn btn-sm btn-outline">Review</a></td></tr>';
+            '<td><button class="btn btn-sm btn-success" onclick="approveShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">Approve</button> ' +
+            '<button class="btn btn-sm btn-danger" onclick="rejectShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">Reject</button> ' +
+            '<a href="/admin/shops/' + shop.id + '" class="btn btn-sm btn-outline">Review</a></td></tr>';
     });
 
     html += '</tbody></table>';
@@ -479,19 +481,64 @@ function renderShopList(pageData, isPending) {
     container.innerHTML = html;
 }
 
-async function approveShop(shopId) {
-    if (!confirm('Approve this shop registration?')) return;
+let approveShopTargetId = null;
+
+function openApproveShopModal(shopId, shopName) {
+    ensureApproveShopModal();
+    approveShopTargetId = shopId;
+    const nameEl = document.getElementById('approveShopName');
+    if (nameEl) nameEl.textContent = shopName || 'this shop';
+    document.getElementById('approveShopModal').classList.add('active');
+}
+
+function closeApproveShopModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('approveShopModal');
+    if (modal) modal.classList.remove('active');
+    approveShopTargetId = null;
+}
+
+function ensureApproveShopModal() {
+    if (document.getElementById('approveShopModal')) return;
+
+    const modalHtml =
+        '<div id="approveShopModal" class="modal-overlay" onclick="closeApproveShopModal(event)">' +
+            '<div class="modal" onclick="event.stopPropagation()" style="padding:32px;">' +
+                '<button type="button" class="modal-close" onclick="closeApproveShopModal()">✕</button>' +
+                '<h2 style="margin-bottom:16px;">Approve Shop</h2>' +
+                '<p class="text-muted" style="margin-bottom:24px; line-height:1.5;">' +
+                    'Are you sure you want to approve <strong id="approveShopName" style="color:var(--white);">this shop</strong>? ' +
+                    'They will be notified and can proceed to select a subscription plan.' +
+                '</p>' +
+                '<div style="border-top:1px solid var(--gray-200); margin-bottom:24px;"></div>' +
+                '<div class="form-actions" style="display:flex; gap:16px; justify-content:flex-end;">' +
+                    '<button type="button" class="btn" style="border:1px solid var(--gray-400); color:var(--gray-300); background:transparent;" onclick="closeApproveShopModal()">Cancel</button>' +
+                    '<button type="button" class="btn btn-gold" onclick="submitApproveShop()">Confirm Approve</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+async function approveShop(shopId, shopName) {
+    openApproveShopModal(shopId, shopName);
+}
+
+async function submitApproveShop() {
+    if (!approveShopTargetId) return;
     try {
-        await apiCall('/api/admin/shops/' + shopId + '/approve', 'POST');
+        await apiCall('/api/admin/shops/' + approveShopTargetId + '/approve', 'POST');
         showToast('Shop approved successfully!', 'success');
+        closeApproveShopModal();
         setTimeout(function() { window.location.reload(); }, 1000);
     } catch (error) {
         showToast('Failed to approve shop.', 'danger');
     }
 }
 
-async function rejectShop(shopId) {
-    openRejectShopModal(shopId);
+async function rejectShop(shopId, shopName) {
+    openRejectShopModal(shopId, shopName);
 }
 
 function ensureRejectShopModal() {
@@ -499,28 +546,25 @@ function ensureRejectShopModal() {
 
     const modalHtml =
         '<div id="rejectShopModal" class="modal-overlay" onclick="closeRejectShopModal(event)">' +
-            '<div class="modal reject-modal" onclick="event.stopPropagation()">' +
-                '<button type="button" class="modal-close" onclick="closeRejectShopModal()">&times;</button>' +
-                '<h2>Reject Shop Registration</h2>' +
-                '<p class="text-sm text-muted mb-4">Please select or enter a reason. The shop owner will receive this by email.</p>' +
-                '<div class="form-group">' +
-                    '<label>Reason</label>' +
-                    '<select id="rejectReasonPreset" class="form-input" onchange="handleRejectReasonPresetChange()">' +
-                        '<option value="">Select a reason</option>' +
-                        '<option value="Invalid or unclear KYC documents">Invalid or unclear KYC documents</option>' +
-                        '<option value="Bank details could not be verified">Bank details could not be verified</option>' +
-                        '<option value="Incomplete registration information">Incomplete registration information</option>' +
-                        '<option value="Shop license or business proof missing">Shop license or business proof missing</option>' +
-                        '<option value="custom">Other (enter custom reason)</option>' +
-                    '</select>' +
+            '<div class="modal reject-modal" onclick="event.stopPropagation()" style="padding:32px;">' +
+                '<button type="button" class="modal-close" onclick="closeRejectShopModal()">✕</button>' +
+                '<h2 style="margin-bottom:16px;">Reject Shop: <span id="rejectShopName" style="color:var(--gold);"></span></h2>' +
+                '<p class="text-sm text-muted mb-4">Please select a reason. The shop owner will receive this by email.</p>' +
+                '<div class="form-group reject-reasons" style="display:flex; flex-direction:column; gap:12px; margin-bottom:24px;">' +
+                    '<label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="rejectReasonPreset" value="Aadhaar document is unclear or unreadable" onchange="handleRejectReasonPresetChange()"> Aadhaar document is unclear or unreadable</label>' +
+                    '<label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="rejectReasonPreset" value="PAN card does not match the name provided" onchange="handleRejectReasonPresetChange()"> PAN card does not match the name provided</label>' +
+                    '<label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="rejectReasonPreset" value="Bank details are incomplete or incorrect" onchange="handleRejectReasonPresetChange()"> Bank details are incomplete or incorrect</label>' +
+                    '<label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="rejectReasonPreset" value="Owner photo is unclear or missing" onchange="handleRejectReasonPresetChange()"> Owner photo is unclear or missing</label>' +
+                    '<label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="rejectReasonPreset" value="custom" onchange="handleRejectReasonPresetChange()"> Other</label>' +
                 '</div>' +
-                '<div class="form-group" id="rejectCustomReasonGroup" style="display:none;">' +
+                '<div class="form-group" id="rejectCustomReasonGroup" style="display:none; margin-bottom:24px;">' +
                     '<label>Custom Reason</label>' +
-                    '<textarea id="rejectCustomReason" class="form-textarea" rows="3" placeholder="Enter rejection reason"></textarea>' +
+                    '<textarea id="rejectCustomReason" class="form-textarea" rows="3" placeholder="Enter rejection reason" oninput="handleRejectReasonPresetChange()"></textarea>' +
                 '</div>' +
-                '<div class="form-actions mt-4">' +
-                    '<button type="button" class="btn btn-outline-navy" onclick="closeRejectShopModal()">Cancel</button>' +
-                    '<button type="button" class="btn btn-danger" onclick="submitRejectShop()">Reject Shop</button>' +
+                '<div style="border-top:1px solid var(--gray-200); margin-bottom:24px;"></div>' +
+                '<div class="form-actions" style="display:flex; gap:16px; justify-content:flex-end;">' +
+                    '<button type="button" class="btn" style="border:1px solid var(--gray-400); color:var(--gray-300); background:transparent;" onclick="closeRejectShopModal()">Cancel</button>' +
+                    '<button type="button" id="btnConfirmReject" class="btn btn-gold" onclick="submitRejectShop()" disabled>Confirm Reject</button>' +
                 '</div>' +
             '</div>' +
         '</div>';
@@ -530,12 +574,16 @@ function ensureRejectShopModal() {
 
 let rejectShopTargetId = null;
 
-function openRejectShopModal(shopId) {
+function openRejectShopModal(shopId, shopName) {
     ensureRejectShopModal();
     rejectShopTargetId = shopId;
-    document.getElementById('rejectReasonPreset').value = '';
+    const nameEl = document.getElementById('rejectShopName');
+    if (nameEl) nameEl.textContent = shopName || 'this shop';
+    const radios = document.querySelectorAll('input[name="rejectReasonPreset"]');
+    radios.forEach(r => r.checked = false);
     document.getElementById('rejectCustomReason').value = '';
     document.getElementById('rejectCustomReasonGroup').style.display = 'none';
+    document.getElementById('btnConfirmReject').disabled = true;
     document.getElementById('rejectShopModal').classList.add('active');
 }
 
@@ -547,13 +595,26 @@ function closeRejectShopModal(event) {
 }
 
 function handleRejectReasonPresetChange() {
-    const preset = document.getElementById('rejectReasonPreset').value;
+    const selectedRadio = document.querySelector('input[name="rejectReasonPreset"]:checked');
+    const preset = selectedRadio ? selectedRadio.value : '';
     const customGroup = document.getElementById('rejectCustomReasonGroup');
+    const customReason = document.getElementById('rejectCustomReason').value.trim();
+    const btnConfirm = document.getElementById('btnConfirmReject');
+    
     customGroup.style.display = preset === 'custom' ? 'block' : 'none';
+    
+    if (preset && preset !== 'custom') {
+        btnConfirm.disabled = false;
+    } else if (preset === 'custom' && customReason.length > 0) {
+        btnConfirm.disabled = false;
+    } else {
+        btnConfirm.disabled = true;
+    }
 }
 
 async function submitRejectShop() {
-    const preset = document.getElementById('rejectReasonPreset').value;
+    const selectedRadio = document.querySelector('input[name="rejectReasonPreset"]:checked');
+    const preset = selectedRadio ? selectedRadio.value : '';
     let reason = preset === 'custom'
         ? document.getElementById('rejectCustomReason').value.trim()
         : preset;

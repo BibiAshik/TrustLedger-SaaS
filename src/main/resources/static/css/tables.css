@@ -155,12 +155,12 @@
 
 .payment-table .payment-mode.cash {
     background: var(--success-bg);
-    color: #155724;
+    color: var(--success);
 }
 
 .payment-table .payment-mode.online {
     background: var(--info-bg);
-    color: #0C5460;
+    color: var(--info);
 }
 
 /* ===== RESPONSIVE TABLE ===== */

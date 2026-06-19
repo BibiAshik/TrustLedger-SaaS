@@ -150,11 +150,11 @@ async function verifyLoanPayment(razorpayResponse, loanId, amountInPaise) {
 
         // Show success
         if (overlay) {
-            overlay.innerHTML = '<div style="text-align:center;padding:40px;">' +
+            overlay.innerHTML = '<div style="text-align:center;padding:40px;color:#FFFFFF;">' +
                 '<div style="font-size:64px;margin-bottom:16px;">✅</div>' +
                 '<h2>Payment Successful!</h2>' +
-                '<p class="text-muted">' + data.message + '</p>' +
-                '<p class="text-sm text-muted">Receipt: ' + data.receiptNumber + '</p>' +
+                '<p class="text-muted" style="color:#A0AEC0;">' + data.message + '</p>' +
+                '<p class="text-sm text-muted" style="color:#A0AEC0;">Receipt: ' + data.receiptNumber + '</p>' +
                 '<a href="/customer/dashboard" class="btn btn-gold mt-4">Back to Dashboard</a></div>';
         } else {
             showToast(data.message || 'Payment successful!', 'success');
@@ -166,10 +166,10 @@ async function verifyLoanPayment(razorpayResponse, loanId, amountInPaise) {
     } catch (error) {
         // Show failure
         if (overlay) {
-            overlay.innerHTML = '<div style="text-align:center;padding:40px;">' +
+            overlay.innerHTML = '<div style="text-align:center;padding:40px;color:#FFFFFF;">' +
                 '<div style="font-size:64px;margin-bottom:16px;">❌</div>' +
                 '<h2>Payment Failed</h2>' +
-                '<p class="text-muted">Please try again or contact support.</p>' +
+                '<p class="text-muted" style="color:#A0AEC0;">Please try again or contact support.</p>' +
                 '<a href="/customer/dashboard" class="btn btn-outline mt-4">Back to Dashboard</a></div>';
         } else {
             showToast('Payment failed. Please try again.', 'danger');
@@ -204,7 +204,7 @@ async function initPayPage(loanId) {
             '💰 Pay Now with Razorpay</button></div>';
 
         // Processing overlay (hidden initially)
-        html += '<div id="paymentProcessing" class="loading-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.95);z-index:9999;">' +
+        html += '<div id="paymentProcessing" class="loading-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(5,5,6,0.95);z-index:9999;color:#FFFFFF;">' +
             '<div class="spinner spinner-lg"></div><p>Processing payment...</p></div>';
 
         container.innerHTML = html;
