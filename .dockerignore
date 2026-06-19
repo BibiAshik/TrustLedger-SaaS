@@ -1,0 +1,41 @@
+# Build artifacts
+target/
+*.jar
+*.war
+
+# IDE files
+.idea/
+*.iml
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git files
+.git
+.gitignore
+
+# Docker files (don't include in image context)
+docker-compose.yml
+.dockerignore
+
+# Logs
+*.log
+logs/
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
+*.env
+
+# Documentation
+README.md
+HELP.md
+docs/

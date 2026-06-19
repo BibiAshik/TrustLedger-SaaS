@@ -1,0 +1,65 @@
+# =============================================================================
+# TRUST LEDGER — .gitignore
+# =============================================================================
+# This file tells Git which files and folders to NEVER commit to the repository.
+# Each entry is explained below so you understand WHY it's ignored.
+# =============================================================================
+
+# ----- Maven Build Output -----
+# The "target/" folder is regenerated every time you run "mvn clean compile"
+# or "mvn package". It contains compiled .class files, packaged .jar files,
+# and other build artifacts. Never needs to be committed — anyone who clones
+# the repo can regenerate it by running Maven.
+target/
+
+# ----- Maven Wrapper Binary -----
+# The Maven wrapper script (mvnw/mvnw.cmd) downloads this .jar automatically.
+# It's a binary file that doesn't belong in version control.
+!.mvn/wrapper/maven-wrapper.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ----- IntelliJ IDEA Project Files -----
+# These are IntelliJ's personal/local project settings. They differ per
+# developer's machine (different JDK paths, editor preferences, etc.).
+# Each developer's IntelliJ generates its own version of these.
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# ----- Eclipse Project Files -----
+# In case anyone opens this project in Eclipse instead of IntelliJ.
+.classpath
+.project
+.settings/
+
+# ----- VS Code -----
+.vscode/
+
+# ----- OS-Specific Junk Files -----
+# macOS creates .DS_Store files in every folder. Windows creates Thumbs.db.
+# These are irrelevant system files that should never be committed.
+.DS_Store
+Thumbs.db
+
+# ----- Local Secrets -----
+# CRITICAL: application-local.properties contains REAL secrets (MySQL password,
+# Razorpay Key Secret, Gmail App Password). This file must NEVER be committed
+# to GitHub or any public repository. This is standard production practice —
+# never hardcode real secrets into version-controlled files.
+src/main/resources/application-local.properties
+
+# ----- Environment Files -----
+# Alternative secret storage formats that should also be ignored
+.env
+.env.local
+.env.*.local
+
+# ----- Uploaded Files -----
+# User-uploaded files (Aadhaar photos, PAN, owner photos, etc.) are stored
+# locally and should not be committed to Git.
+uploads/
+
+# ----- Log Files -----
+*.log
+logs/

@@ -1,0 +1,78 @@
+# =============================================================================
+# docker-compose.yml — Trust Ledger SaaS Complete Stack
+# =============================================================================
+# Services:
+#   - app: The Spring Boot application
+#   - db: MySQL 8 database
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ----- MySQL Database -----
+  db:
+    image: mysql:8.0
+    container_name: trustledger-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: trustledger_db
+      MYSQL_ROOT_PASSWORD: trustledger_root_password
+      MYSQL_USER: trustledger_user
+      MYSQL_PASSWORD: trustledger_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - trustledger-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----- Spring Boot Application -----
+  app:
+    build: .
+    container_name: trustledger-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Database connection
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/trustledger_db?useSSL=false&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: trustledger_user
+      SPRING_DATASOURCE_PASSWORD: trustledger_password
+
+      # JPA / Hibernate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+
+      # JWT (CHANGE THIS IN PRODUCTION!)
+      JWT_SECRET: your-very-long-jwt-secret-key-change-this-in-production-64chars-minimum
+
+      # Razorpay credentials (replace with your actual keys)
+      RAZORPAY_KEY_ID: rzp_test_xxxxxxxxxxxx
+      RAZORPAY_KEY_SECRET: xxxxxxxxxxxxxxxxxxxxxxxxxx
+
+      # Email (configure your SMTP)
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: "587"
+      SPRING_MAIL_USERNAME: your-email@gmail.com
+      SPRING_MAIL_PASSWORD: your-app-password
+
+      # Super Admin credentials (auto-created on first run)
+      SUPER_ADMIN_EMAIL: admin@trustledger.com
+      SUPER_ADMIN_PASSWORD: Admin@123
+
+      # File upload path
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - trustledger-uploads:/app/uploads
+
+volumes:
+  trustledger-data:
+    driver: local
+  trustledger-uploads:
+    driver: local
