@@ -1,0 +1,354 @@
+/* =============================================================================
+   DASHBOARD.CSS — Dashboard page styles for all three roles
+   ============================================================================= */
+
+/* ===== STATS GRID ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+    margin-bottom: var(--space-8);
+}
+
+/* ===== RECENT ACTIVITY / LIST SECTIONS ===== */
+.section-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.section-card .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.section-card .section-header h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: 0;
+}
+
+.section-card .section-header a {
+    font-size: var(--font-size-sm);
+    color: var(--gold-dark);
+    font-weight: 600;
+}
+
+.section-card .section-body {
+    padding: var(--space-4) var(--space-6);
+}
+
+/* ===== LIST ITEMS ===== */
+.list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--gray-100);
+    transition: background var(--transition-fast);
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item:hover {
+    background: var(--gray-50);
+    margin: 0 calc(-1 * var(--space-6));
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+    border-radius: var(--radius-sm);
+}
+
+.list-item .item-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.list-item .item-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--gold-dark);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.list-item .item-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.list-item .item-name {
+    font-weight: 600;
+    color: var(--navy);
+    font-size: var(--font-size-sm);
+}
+
+.list-item .item-sub {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    margin-top: 2px;
+}
+
+.list-item .item-right {
+    text-align: right;
+}
+
+.list-item .item-amount {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: var(--font-size-sm);
+}
+
+.list-item .item-date {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    margin-top: 2px;
+}
+
+/* ===== CUSTOMER LIST ITEM ===== */
+.customer-list-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--gray-100);
+    transition: background var(--transition-fast);
+    cursor: pointer;
+}
+
+.customer-list-item:hover {
+    background: var(--gray-50);
+}
+
+.customer-list-item .customer-photo {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--gold-dark);
+    flex-shrink: 0;
+    margin-right: var(--space-4);
+    overflow: hidden;
+}
+
+.customer-list-item .customer-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.customer-list-item .customer-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.customer-list-item .customer-name {
+    font-weight: 600;
+    color: var(--navy);
+    font-size: var(--font-size-sm);
+}
+
+.customer-list-item .customer-phone {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+}
+
+.customer-list-item .customer-stats {
+    display: flex;
+    gap: var(--space-6);
+    margin-left: auto;
+}
+
+.customer-list-item .customer-stat {
+    text-align: center;
+}
+
+.customer-list-item .customer-stat .stat-value {
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    color: var(--navy);
+}
+
+.customer-list-item .customer-stat .stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+}
+
+/* ===== LOAN CARDS (Customer Dashboard) ===== */
+.loan-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.loan-item {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    border: 1px solid var(--gray-200);
+    transition: all var(--transition-fast);
+}
+
+.loan-item:hover {
+    border-color: var(--gold);
+    box-shadow: var(--shadow-sm);
+}
+
+.loan-item .loan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+}
+
+.loan-item .loan-id {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: var(--font-size-sm);
+}
+
+.loan-item .loan-details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.loan-item .loan-detail {
+    text-align: center;
+}
+
+.loan-item .loan-detail .detail-label {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    margin-bottom: 2px;
+}
+
+.loan-item .loan-detail .detail-value {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: var(--font-size-sm);
+}
+
+.loan-item .loan-actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: flex-end;
+}
+
+/* ===== DETAIL PAGE LAYOUT ===== */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.detail-group {
+    margin-bottom: var(--space-4);
+}
+
+.detail-label {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-1);
+}
+
+.detail-value {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.detail-value.large {
+    font-size: var(--font-size-2xl);
+    font-weight: 800;
+}
+
+/* ===== SETTINGS PAGE ===== */
+.settings-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-6);
+}
+
+.settings-section h3 {
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--gold);
+}
+
+.subscription-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--cream);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    margin-bottom: var(--space-4);
+}
+
+.subscription-info .plan-info h4 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-1);
+}
+
+.subscription-info .plan-info p {
+    font-size: var(--font-size-sm);
+    margin-bottom: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .customer-list-item {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+
+    .customer-list-item .customer-stats {
+        width: 100%;
+        margin-left: 0;
+        justify-content: space-around;
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--gray-100);
+    }
+
+    .loan-item .loan-details-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

@@ -1,0 +1,676 @@
+/* =============================================================================
+   AUTH.CSS — Login, Registration, and Customer Login Page Styles
+   ============================================================================= */
+
+/* ===== PUBLIC HOMEPAGE ===== */
+.hero-section {
+    background: #050506;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-6) var(--space-8);
+    margin: var(--space-6) auto 0;
+    width: min(1480px, calc(100% - 48px));
+    position: relative;
+    z-index: 10;
+    border: 1px solid rgba(245, 197, 24, 0.22);
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.86), rgba(12, 12, 14, 0.78));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 18px 44px rgba(0, 0, 0, 0.28);
+}
+
+.hero-navbar .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.hero-navbar .logo img {
+    height: clamp(76px, 8vw, 142px);
+    width: auto;
+    max-width: min(58vw, 780px);
+    object-fit: contain;
+}
+
+.hero-navbar .logo span {
+    font-size: var(--font-size-xl);
+    font-weight: 800;
+    color: var(--white);
+}
+
+.hero-navbar .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.hero-navbar .nav-actions .btn {
+    min-width: 178px;
+}
+
+.hero-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-10) var(--space-8) var(--space-12);
+    position: relative;
+    background: linear-gradient(180deg, #050506 0%, #0d0d12 54%, #111116 100%);
+}
+
+.hero-content h1 {
+    color: var(--white);
+    font-size: clamp(2.4rem, 5vw, 4.6rem);
+    font-weight: 800;
+    margin-bottom: var(--space-4);
+    line-height: 1.15;
+}
+
+.hero-content h1 .gold-text {
+    color: var(--gold);
+}
+
+.hero-tagline {
+    color: var(--gold-light);
+    font-size: var(--font-size-xl);
+    font-weight: 500;
+    margin-bottom: var(--space-8);
+    font-style: italic;
+}
+
+.hero-cta {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Gold shimmer animation for hero */
+.hero-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(212,160,23,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* ===== FEATURES SECTION ===== */
+.features-section {
+    background: var(--cream);
+    padding: var(--space-12) var(--space-8);
+}
+
+.features-section h2 {
+    text-align: center;
+    margin-bottom: var(--space-2);
+}
+
+.features-section .section-subtitle {
+    text-align: center;
+    color: var(--gray-500);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-10);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    border: 1px solid var(--gray-100);
+}
+
+.feature-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+    border-color: var(--gold);
+}
+
+.feature-card .feature-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-5);
+    font-size: 24px;
+    color: var(--navy);
+}
+
+.feature-card h4 {
+    margin-bottom: var(--space-2);
+}
+
+.feature-card p {
+    font-size: var(--font-size-sm);
+    margin-bottom: 0;
+}
+
+/* ===== PLANS SECTION ===== */
+.plans-section {
+    background: var(--white);
+    padding: var(--space-12) var(--space-8);
+}
+
+.plans-section h2 {
+    text-align: center;
+    margin-bottom: var(--space-2);
+}
+
+.plans-section .section-subtitle {
+    text-align: center;
+    color: var(--gray-500);
+    margin-bottom: var(--space-10);
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.plan-card {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    text-align: center;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.plan-card.recommended {
+    border-color: var(--gold);
+    box-shadow: var(--shadow-gold);
+    transform: scale(1.02);
+}
+
+.plan-card .plan-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+    padding: 4px 20px;
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.plan-card h3 {
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-2);
+}
+
+.plan-card .plan-price {
+    font-size: var(--font-size-4xl);
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: var(--space-1);
+}
+
+.plan-card .plan-price span {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--gray-500);
+}
+
+.plan-features {
+    text-align: left;
+    margin: var(--space-6) 0;
+}
+
+.plan-features li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+.plan-features li .check {
+    color: var(--success);
+    font-weight: 700;
+}
+
+.plan-features li .cross {
+    color: var(--gray-400);
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+    background: #050506;
+    color: var(--gray-400);
+    padding: var(--space-8);
+    text-align: center;
+    font-size: var(--font-size-sm);
+}
+
+.site-footer .tagline {
+    color: var(--gold);
+    font-style: italic;
+    margin-bottom: var(--space-2);
+}
+
+/* ===== LOGIN MODAL STYLES ===== */
+.login-modal .modal-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+}
+
+.login-modal .modal-logo img {
+    height: 48px;
+}
+
+.login-modal .form-group {
+    margin-bottom: var(--space-5);
+}
+
+.login-modal .form-group label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: var(--space-2);
+}
+
+.login-modal .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-fast);
+}
+
+.login-modal .form-group input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(212,160,23,0.1);
+}
+
+.login-modal .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-4);
+    font-size: var(--font-size-sm);
+}
+
+.login-modal .form-footer a {
+    color: var(--gold-dark);
+    font-weight: 500;
+}
+
+.login-modal .error-message {
+    color: var(--danger);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-2);
+    display: none;
+}
+
+/* ===== CUSTOMER LOGIN PAGE ===== */
+.customer-login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream);
+    padding: var(--space-4);
+}
+
+.customer-login-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
+    width: 100%;
+    max-width: 440px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.customer-login-card .logo {
+    margin-bottom: var(--space-6);
+}
+
+.customer-login-card .logo img {
+    height: 48px;
+    margin: 0 auto;
+}
+
+.customer-login-card h2 {
+    margin-bottom: var(--space-2);
+}
+
+.customer-login-card .subtitle {
+    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-6);
+}
+
+/* Shop selection screen (multi-shop login disambiguation) */
+.shop-selection {
+    text-align: left;
+}
+
+.shop-selection h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-4);
+    text-align: center;
+}
+
+.shop-selection .shop-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.shop-selection .shop-option:hover,
+.shop-selection .shop-option.selected {
+    border-color: var(--gold);
+    background: rgba(212,160,23,0.05);
+}
+
+.shop-selection .shop-option input[type="radio"] {
+    accent-color: var(--gold);
+    width: 18px;
+    height: 18px;
+}
+
+.shop-selection .shop-option .shop-name {
+    font-weight: 600;
+    color: var(--navy);
+}
+
+/* ===== REGISTER SHOP PAGE ===== */
+.register-page {
+    min-height: 100vh;
+    background: var(--cream);
+    padding: var(--space-8) var(--space-4);
+}
+
+.register-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
+    max-width: 700px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-lg);
+}
+
+.register-card .logo {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.register-card .logo img {
+    height: 48px;
+    margin: 0 auto;
+}
+
+.register-card h1 {
+    text-align: center;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-2);
+}
+
+.register-card .subtitle {
+    text-align: center;
+    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-8);
+}
+
+.register-section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--navy);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--gold);
+    margin-bottom: var(--space-5);
+    margin-top: var(--space-6);
+}
+
+/* ===== ADMIN LOGIN PAGE ===== */
+.admin-login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--navy);
+    padding: var(--space-4);
+}
+
+.admin-login-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-xl);
+    text-align: center;
+}
+
+/* ===== CHANGE PASSWORD PAGE ===== */
+.change-password-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream);
+    padding: var(--space-4);
+}
+
+.change-password-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
+    width: 100%;
+    max-width: 440px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1180px) {
+    .hero-navbar {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-5);
+    }
+
+    .hero-navbar .logo {
+        justify-content: center;
+    }
+
+    .hero-navbar .logo img {
+        max-width: min(100%, 560px);
+    }
+
+    .hero-navbar .nav-actions {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-navbar {
+        width: calc(100% - 28px);
+        margin-top: var(--space-4);
+        padding: var(--space-4);
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-4);
+    }
+
+    .hero-navbar .logo {
+        justify-content: center;
+    }
+
+    .hero-navbar .logo img {
+        height: auto;
+        width: min(100%, 420px);
+        max-width: 100%;
+    }
+
+    .hero-navbar .nav-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-navbar .nav-actions .btn {
+        flex: 1 1 220px;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .hero-content h1 {
+        font-size: var(--font-size-3xl);
+    }
+
+    .hero-cta {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-cta .btn {
+        width: min(100%, 320px);
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        padding: 0 var(--space-4);
+    }
+
+    .features-section {
+        padding: var(--space-8) var(--space-4);
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plans-section {
+        padding: var(--space-8) var(--space-4);
+    }
+
+    .register-card {
+        padding: var(--space-6);
+    }
+}
+
+/* ===== APPLICATION STATUS TRACKER ===== */
+.application-status-card {
+    max-width: 560px;
+}
+
+.status-shop-name {
+    text-align: center;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: var(--space-2);
+}
+
+.status-tracker {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+}
+
+.status-step {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+    padding: var(--space-4);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    background: var(--gray-50);
+    opacity: 0.55;
+}
+
+.status-step.completed {
+    opacity: 1;
+    border-color: rgba(201, 162, 39, 0.35);
+    background: rgba(201, 162, 39, 0.08);
+}
+
+.status-step.active {
+    opacity: 1;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.15);
+}
+
+.status-step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--gray-200);
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.status-step.completed .status-step-icon,
+.status-step.active .status-step-icon {
+    background: var(--gold);
+    color: var(--white);
+}
+
+.status-step-title {
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: var(--space-1);
+}
+
+.status-step-desc {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+.reject-modal {
+    max-width: 480px;
+}
+

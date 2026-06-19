@@ -1,0 +1,213 @@
+/* =============================================================================
+   TABLES.CSS — Table styles for all data list/table views
+   ============================================================================= */
+
+/* ===== BASE TABLE ===== */
+.data-table-container {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.data-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--gray-100);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.data-table-header h3 {
+    margin-bottom: 0;
+}
+
+.data-table-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead th {
+    background: var(--gray-50);
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--gray-200);
+    white-space: nowrap;
+}
+
+.data-table tbody td {
+    padding: var(--space-4);
+    font-size: var(--font-size-sm);
+    color: var(--navy);
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+}
+
+.data-table tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Clickable row */
+.data-table tbody tr.clickable {
+    cursor: pointer;
+}
+
+.data-table tbody tr.clickable:hover {
+    background: rgba(212,160,23,0.04);
+}
+
+/* ===== TABLE CELL VARIANTS ===== */
+.td-name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.td-name .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--gold-dark);
+    font-size: var(--font-size-xs);
+    flex-shrink: 0;
+}
+
+.td-name .name-text {
+    font-weight: 600;
+}
+
+.td-name .sub-text {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+}
+
+.td-amount {
+    font-weight: 700;
+    font-family: 'Inter', monospace;
+}
+
+.td-amount.positive { color: var(--success); }
+.td-amount.negative { color: var(--danger); }
+
+.td-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.td-actions .btn {
+    padding: 4px 12px;
+    font-size: var(--font-size-xs);
+}
+
+/* ===== TABLE FOOTER ===== */
+.data-table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--gray-100);
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
+}
+
+/* ===== REVENUE LOG TABLE ===== */
+.revenue-table td:last-child {
+    font-weight: 700;
+    color: var(--navy);
+}
+
+/* ===== PAYMENT HISTORY TABLE ===== */
+.payment-table .payment-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.payment-table .payment-mode.cash {
+    background: var(--success-bg);
+    color: #155724;
+}
+
+.payment-table .payment-mode.online {
+    background: var(--info-bg);
+    color: #0C5460;
+}
+
+/* ===== RESPONSIVE TABLE ===== */
+@media (max-width: 768px) {
+    .data-table-container {
+        border-radius: var(--radius-md);
+    }
+
+    .data-table-header {
+        padding: var(--space-4);
+    }
+
+    /* Convert table to card layout on mobile */
+    .data-table-responsive thead {
+        display: none;
+    }
+
+    .data-table-responsive tbody tr {
+        display: block;
+        padding: var(--space-4);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .data-table-responsive tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-2) 0;
+        border-bottom: none;
+        font-size: var(--font-size-sm);
+    }
+
+    .data-table-responsive tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: var(--font-size-xs);
+        color: var(--gray-500);
+        text-transform: uppercase;
+    }
+
+    .data-table-footer {
+        flex-direction: column;
+        gap: var(--space-3);
+        text-align: center;
+    }
+
+    .td-actions {
+        justify-content: flex-end;
+    }
+}
