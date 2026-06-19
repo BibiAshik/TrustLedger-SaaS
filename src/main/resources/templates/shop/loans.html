@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Loans — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/tables.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Shop</span></div>
+        <div class="navbar-menu"><button onclick="logout()">Logout</button></div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
+                <a href="/shop/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="sidebar-section-title">Customers</div>
+                <a href="/shop/customers"><span class="nav-icon">👤</span> All Customers</a>
+                <a href="/shop/add-customer"><span class="nav-icon">➕</span> Add Customer</a>
+                <div class="sidebar-section-title">Loans</div>
+                <a href="/shop/loans" class="active"><span class="nav-icon">📋</span> All Loans</a>
+                <a href="/shop/create-loan"><span class="nav-icon">➕</span> Create Loan</a>
+                <a href="/shop/overdue-loans"><span class="nav-icon">⚠️</span> Overdue Loans</a>
+                <div class="sidebar-section-title">Account</div>
+                <a href="/shop/settings"><span class="nav-icon">⚙️</span> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1>All Loans</h1>
+                    <p class="breadcrumb">View and manage all your shop's loans</p>
+                </div>
+                <div class="flex gap-3">
+                    <!-- Status filter buttons -->
+                    <select id="statusFilter" class="form-select" style="width:auto;padding:8px 36px 8px 12px;" onchange="loadLoans(0, this.value)">
+                        <option value="">All Statuses</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="OVERDUE">Overdue</option>
+                        <option value="CLOSED">Closed</option>
+                        <option value="SEIZED">Seized</option>
+                    </select>
+                    <a href="/shop/create-loan" class="btn btn-gold">+ New Loan</a>
+                </div>
+            </div>
+
+            <div id="loanListContent">
+                <div class="loading-overlay"><div class="spinner spinner-lg"></div><p>Loading loans...</p></div>
+            </div>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="/shop/dashboard" class="bottom-nav-item"><span class="nav-icon">📊</span> Home</a>
+            <a href="/shop/customers" class="bottom-nav-item"><span class="nav-icon">👤</span> Customers</a>
+            <a href="/shop/loans" class="bottom-nav-item active"><span class="nav-icon">📋</span> Loans</a>
+            <a href="/shop/settings" class="bottom-nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </div>
+    </nav>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+        loadLoans(0);
+    </script>
+</body>
+</html>

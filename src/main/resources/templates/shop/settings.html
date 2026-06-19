@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/forms.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Shop</span></div>
+        <div class="navbar-menu"><button onclick="logout()">Logout</button></div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
+                <a href="/shop/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="sidebar-section-title">Customers</div>
+                <a href="/shop/customers"><span class="nav-icon">👤</span> All Customers</a>
+                <a href="/shop/add-customer"><span class="nav-icon">➕</span> Add Customer</a>
+                <div class="sidebar-section-title">Loans</div>
+                <a href="/shop/loans"><span class="nav-icon">📋</span> All Loans</a>
+                <a href="/shop/create-loan"><span class="nav-icon">➕</span> Create Loan</a>
+                <a href="/shop/overdue-loans"><span class="nav-icon">⚠️</span> Overdue Loans</a>
+                <div class="sidebar-section-title">Account</div>
+                <a href="/shop/settings" class="active"><span class="nav-icon">⚙️</span> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>⚙️ Shop Settings</h1>
+            </div>
+
+            <div id="settingsContent">
+                <div class="loading-overlay"><div class="spinner spinner-lg"></div><p>Loading settings...</p></div>
+            </div>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="/shop/dashboard" class="bottom-nav-item"><span class="nav-icon">📊</span> Home</a>
+            <a href="/shop/customers" class="bottom-nav-item"><span class="nav-icon">👤</span> Customers</a>
+            <a href="/shop/loans" class="bottom-nav-item"><span class="nav-icon">📋</span> Loans</a>
+            <a href="/shop/settings" class="bottom-nav-item active"><span class="nav-icon">⚙️</span> Settings</a>
+        </div>
+    </nav>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/payment.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+
+        async function loadSettings() {
+            try {
+                var data = await apiCall('/api/shop/settings', 'GET');
+                renderSettings(data);
+            } catch (error) {
+                showToast('Failed to load settings.', 'danger');
+            }
+        }
+
+        function renderSettings(data) {
+            var shop = data;
+            var html = '';
+
+            // Subscription section
+            html += '<div class="settings-section"><h3>📋 Subscription</h3>';
+            html += '<div class="subscription-info"><div class="plan-info">';
+            html += '<h4><span class="badge badge-' + (shop.plan || 'basic').toLowerCase() + '">' + (shop.plan || 'BASIC') + '</span> Plan</h4>';
+            html += '<p>Status: ' + (shop.subscriptionStatus || 'NONE') + '</p>';
+            if (shop.subscriptionExpiryDate) {
+                html += '<p>Expires: ' + formatDate(shop.subscriptionExpiryDate) + '</p>';
+            }
+            html += '</div>';
+            html += '<div><button class="btn btn-gold" onclick="paySubscription(\'BASIC\')">Renew Basic (₹299)</button> ';
+            html += '<button class="btn btn-gold" onclick="paySubscription(\'PRO\')">Upgrade to Pro (₹699)</button></div>';
+            html += '</div></div>';
+
+            // Plan comparison
+            html += '<div class="settings-section"><h3>📊 Plan Comparison</h3>';
+            html += '<table class="data-table"><thead><tr><th>Feature</th><th>Basic (₹299)</th><th>Pro (₹699)</th></tr></thead><tbody>';
+            html += '<tr><td>Customer Limit</td><td>100</td><td>Unlimited</td></tr>';
+            html += '<tr><td>Customer Portal</td><td>❌</td><td>✅</td></tr>';
+            html += '<tr><td>Online Payments</td><td>❌</td><td>✅</td></tr>';
+            html += '<tr><td>PDF Receipts</td><td>❌</td><td>✅</td></tr>';
+            html += '<tr><td>Payment History</td><td>❌</td><td>✅</td></tr>';
+            html += '</tbody></table></div>';
+
+            // Shop Profile section
+            html += '<div class="settings-section"><h3>🏪 Shop Profile</h3>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-group"><div class="detail-label">Shop Name</div><div class="detail-value">' + shop.shopName + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Phone</div><div class="detail-value">' + shop.phone + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Email</div><div class="detail-value">' + shop.email + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Address</div><div class="detail-value">' + shop.address + ', ' + shop.city + ' ' + shop.pincode + '</div></div>';
+            html += '</div></div>';
+
+            // Bank Details section
+            html += '<div class="settings-section"><h3>🏦 Bank Details</h3>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-group"><div class="detail-label">Account Number</div><div class="detail-value">' + shop.bankAccountNumber + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">IFSC</div><div class="detail-value">' + shop.ifscCode + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Account Holder</div><div class="detail-value">' + shop.accountHolderName + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">UPI ID</div><div class="detail-value">' + (shop.upiId || '—') + '</div></div>';
+            html += '</div></div>';
+
+            // Change Password section
+            html += '<div class="settings-section"><h3>🔑 Change Password</h3>';
+            html += '<form onsubmit="changePassword(event)">';
+            html += '<div class="form-row"><div class="form-group"><label>Current Password</label>' +
+                '<input type="password" id="currentPassword" class="form-input" required></div>';
+            html += '<div class="form-group"><label>New Password</label>' +
+                '<input type="password" id="newPassword" class="form-input" minlength="6" required></div></div>';
+            html += '<button type="submit" class="btn btn-navy mt-4">Update Password</button></form></div>';
+
+            document.getElementById('settingsContent').innerHTML = html;
+        }
+
+        async function changePassword(event) {
+            event.preventDefault();
+            try {
+                await apiCall('/api/auth/change-password', 'POST', {
+                    currentPassword: document.getElementById('currentPassword').value,
+                    newPassword: document.getElementById('newPassword').value
+                });
+                showToast('Password updated successfully!', 'success');
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+            } catch (error) {
+                showToast('Failed to change password.', 'danger');
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>

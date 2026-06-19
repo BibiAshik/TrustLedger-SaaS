@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Your Shop — Trust Ledger</title>
+    <meta name="description" content="Register your gold loan shop on Trust Ledger platform.">
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/forms.css">
+</head>
+<body>
+
+    <div class="register-page">
+        <div class="register-card">
+            <div class="logo">
+                <img src="/images/logo-light.png" alt="Trust Ledger">
+            </div>
+            <h1>Register Your Shop</h1>
+            <p class="subtitle">Join Trust Ledger and digitize your gold loan business</p>
+
+            <form id="registerForm" onsubmit="handleShopRegistration(event)" enctype="multipart/form-data">
+
+                <!-- SECTION 1: Shop Information -->
+                <div class="form-section-title">Shop Information</div>
+
+                <div class="form-group">
+                    <label>Shop Name <span class="required">*</span></label>
+                    <input type="text" name="shopName" class="form-input" placeholder="e.g. Krishna Gold Loans" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Owner Full Name <span class="required">*</span></label>
+                        <input type="text" name="ownerFullName" class="form-input" placeholder="Full legal name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" name="phone" class="form-input" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" name="email" class="form-input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password <span class="required">*</span></label>
+                        <input type="password" name="password" class="form-input" placeholder="Choose a strong password" minlength="6" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Shop Address <span class="required">*</span></label>
+                    <textarea name="address" class="form-textarea" rows="2" placeholder="Full street address" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City <span class="required">*</span></label>
+                        <input type="text" name="city" class="form-input" placeholder="City name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>PIN Code <span class="required">*</span></label>
+                        <input type="text" name="pincode" class="form-input" placeholder="6-digit PIN" pattern="[0-9]{6}" required>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Owner Photo -->
+                <div class="form-section-title">Owner Photo</div>
+
+                <div class="form-group">
+                    <label>Owner Photo <span class="required">*</span></label>
+                    <div class="file-upload">
+                        <div class="file-upload-area">
+                            <div class="upload-icon">📸</div>
+                            <div class="upload-text">Click to upload owner photo</div>
+                            <div class="upload-hint">JPG, PNG — max 5MB</div>
+                            <div class="file-name"></div>
+                            <input type="file" name="ownerPhoto" accept="image/*" onchange="handleFileSelect(this)" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: KYC Documents -->
+                <div class="form-section-title">KYC Documents</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Aadhaar Front <span class="required">*</span></label>
+                        <div class="file-upload">
+                            <div class="file-upload-area">
+                                <div class="upload-icon">🪪</div>
+                                <div class="upload-text">Aadhaar card front</div>
+                                <div class="file-name"></div>
+                                <input type="file" name="aadhaarFront" accept="image/*" onchange="handleFileSelect(this)" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Aadhaar Back <span class="required">*</span></label>
+                        <div class="file-upload">
+                            <div class="file-upload-area">
+                                <div class="upload-icon">🪪</div>
+                                <div class="upload-text">Aadhaar card back</div>
+                                <div class="file-name"></div>
+                                <input type="file" name="aadhaarBack" accept="image/*" onchange="handleFileSelect(this)" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>PAN Card Image <span class="required">*</span></label>
+                    <div class="file-upload">
+                        <div class="file-upload-area">
+                            <div class="upload-icon">💳</div>
+                            <div class="upload-text">PAN card image or PDF</div>
+                            <div class="file-name"></div>
+                            <input type="file" name="panCard" accept="image/*,.pdf" onchange="handleFileSelect(this)" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>PAN Number <span class="required">*</span></label>
+                        <input type="text" name="panNumber" class="form-input" placeholder="e.g. ABCDE1234F"
+                               pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                               title="PAN must be in format ABCDE1234F (5 letters, 4 digits, 1 letter)"
+                               maxlength="10" style="text-transform:uppercase" required>
+                        <small class="form-hint">Required by Razorpay for payment settlement</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Business Type <span class="required">*</span></label>
+                        <select name="businessType" class="form-input" required>
+                            <option value="" disabled selected>Select business type</option>
+                            <option value="individual">Individual</option>
+                            <option value="proprietorship">Sole Proprietorship</option>
+                            <option value="partnership">Partnership Firm</option>
+                            <option value="private_limited">Private Limited Company</option>
+                            <option value="public_limited">Public Limited Company</option>
+                            <option value="llp">Limited Liability Partnership (LLP)</option>
+                            <option value="trust">Trust / Society</option>
+                        </select>
+                        <small class="form-hint">Required by Razorpay for payment routing</small>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Bank Details -->
+                <div class="form-section-title">Bank Details</div>
+                <p class="text-sm text-muted mb-4">For receiving customer payments directly to your account</p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Bank Account Number <span class="required">*</span></label>
+                        <input type="text" name="bankAccountNumber" class="form-input" placeholder="Account number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>IFSC Code <span class="required">*</span></label>
+                        <input type="text" name="ifscCode" class="form-input" placeholder="e.g. SBIN0001234" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Account Holder Name <span class="required">*</span></label>
+                        <input type="text" name="accountHolderName" class="form-input" placeholder="As on bank passbook" required>
+                    </div>
+                    <div class="form-group">
+                        <label>UPI ID <span class="optional">(Optional)</span></label>
+                        <input type="text" name="upiId" class="form-input" placeholder="e.g. yourname@upi">
+                    </div>
+                </div>
+
+                <!-- SECTION 5: Optional Documents -->
+                <div class="form-section-title">Optional Documents</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>GST Number <span class="optional">(Optional)</span></label>
+                        <input type="text" name="gstNumber" class="form-input" placeholder="If applicable">
+                    </div>
+                    <div class="form-group">
+                        <label>Shop License <span class="optional">(Optional)</span></label>
+                        <div class="file-upload">
+                            <div class="file-upload-area">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">Upload license</div>
+                                <div class="file-name"></div>
+                                <input type="file" name="shopLicense" accept="image/*,.pdf" onchange="handleFileSelect(this)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-actions">
+                    <a href="/" class="btn btn-outline-navy">← Back to Home</a>
+                    <button type="submit" class="btn btn-gold btn-lg">Register My Shop</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

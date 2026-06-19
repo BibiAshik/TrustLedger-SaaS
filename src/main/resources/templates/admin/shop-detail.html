@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Detail — Trust Ledger Admin</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/tables.css">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="/images/logo-light.png" alt="Trust Ledger">
+            <span>Admin Panel</span>
+        </div>
+        <div class="navbar-menu">
+            <span class="text-sm text-muted">Super Admin</span>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
+                <a href="/admin/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="sidebar-section-title">Shop Management</div>
+                <a href="/admin/shop-approvals"><span class="nav-icon">⏳</span> Pending Approvals</a>
+                <a href="/admin/shops" class="active"><span class="nav-icon">🏪</span> All Shops</a>
+                <div class="sidebar-section-title">Revenue</div>
+                <a href="/admin/subscriptions"><span class="nav-icon">💰</span> Subscription Revenue</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <a href="/admin/shops" class="text-sm" style="color: var(--gray-500);">← Back to All Shops</a>
+                    <h1 id="shopTitle">Shop Detail</h1>
+                </div>
+                <div id="shopActions"></div>
+            </div>
+
+            <div id="shopDetailContent">
+                <div class="loading-overlay">
+                    <div class="spinner spinner-lg"></div>
+                    <p>Loading shop details...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+
+        // Extract shop ID from URL (e.g., /admin/shops/5)
+        var pathParts = window.location.pathname.split('/');
+        var shopId = pathParts[pathParts.length - 1];
+
+        async function loadShopDetail() {
+            try {
+                var shop = await apiCall('/api/admin/shops/' + shopId, 'GET');
+                renderShopDetail(shop);
+            } catch (error) {
+                showToast('Failed to load shop details.', 'danger');
+            }
+        }
+
+        function renderShopDetail(shop) {
+            document.getElementById('shopTitle').textContent = shop.shopName;
+
+            // Action buttons
+            var actionsHtml = '';
+            if (shop.status === 'PENDING') {
+                actionsHtml = '<button class="btn btn-success" onclick="approveShop(' + shop.id + ')">✅ Approve</button> ' +
+                    '<button class="btn btn-danger" onclick="rejectShop(' + shop.id + ')">❌ Reject</button>';
+            } else if (shop.status !== 'SUSPENDED') {
+                actionsHtml = '<button class="btn btn-danger" onclick="suspendShop(' + shop.id + ')">🚫 Suspend Shop</button>';
+            }
+            document.getElementById('shopActions').innerHTML = actionsHtml;
+
+            var html = '';
+
+            // Status & Plan info
+            html += '<div class="flex gap-3 mb-6">' + getStatusBadge(shop.status) +
+                ' <span class="badge badge-' + (shop.plan || 'basic').toLowerCase() + '">' + (shop.plan || 'BASIC') + ' Plan</span></div>';
+
+            // Shop Profile Card
+            html += '<div class="card mb-6"><div class="card-header"><h3>Shop Profile</h3></div>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-group"><div class="detail-label">Shop Name</div><div class="detail-value">' + shop.shopName + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Owner</div><div class="detail-value">' + shop.ownerFullName + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Phone</div><div class="detail-value">' + shop.phone + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Email</div><div class="detail-value">' + shop.email + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Address</div><div class="detail-value">' + shop.address + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">City</div><div class="detail-value">' + shop.city + ', ' + shop.pincode + '</div></div>';
+            html += '</div></div>';
+
+            // KYC & Payment Routing Card
+            html += '<div class="card mb-6"><div class="card-header"><h3>KYC &amp; Payment Routing</h3></div>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-group"><div class="detail-label">PAN Number</div><div class="detail-value">' + (shop.panNumber || '—') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Business Type</div><div class="detail-value">' + formatBusinessType(shop.businessType) + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Razorpay Linked Account</div><div class="detail-value">' + formatLinkedAccountStatus(shop.razorpayLinkedAccountId) + '</div></div>';
+            html += '</div></div>';
+
+            // Bank Details Card
+            html += '<div class="card mb-6"><div class="card-header"><h3>Bank Details</h3></div>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-group"><div class="detail-label">Account Number</div><div class="detail-value">' + shop.bankAccountNumber + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">IFSC Code</div><div class="detail-value">' + shop.ifscCode + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Account Holder</div><div class="detail-value">' + shop.accountHolderName + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">UPI ID</div><div class="detail-value">' + (shop.upiId || '—') + '</div></div>';
+            html += '</div></div>';
+
+            // Uploaded Documents Card
+            html += '<div class="card mb-6"><div class="card-header"><h3>Uploaded Documents</h3></div><div class="detail-grid">';
+            if (shop.ownerPhotoPath) html += '<div class="detail-group"><div class="detail-label">Owner Photo</div><img src="/uploads/' + shop.ownerPhotoPath + '" style="max-width:200px;border-radius:8px;"></div>';
+            if (shop.aadhaarFrontPath) html += '<div class="detail-group"><div class="detail-label">Aadhaar Front</div><img src="/uploads/' + shop.aadhaarFrontPath + '" style="max-width:300px;border-radius:8px;"></div>';
+            if (shop.aadhaarBackPath) html += '<div class="detail-group"><div class="detail-label">Aadhaar Back</div><img src="/uploads/' + shop.aadhaarBackPath + '" style="max-width:300px;border-radius:8px;"></div>';
+            if (shop.panPath) html += '<div class="detail-group"><div class="detail-label">PAN Card</div><img src="/uploads/' + shop.panPath + '" style="max-width:300px;border-radius:8px;"></div>';
+            if (shop.shopLicensePath) html += '<div class="detail-group"><div class="detail-label">Shop License</div><img src="/uploads/' + shop.shopLicensePath + '" style="max-width:300px;border-radius:8px;"></div>';
+            html += '</div></div>';
+
+            // Subscription Info
+            html += '<div class="card mb-6"><div class="card-header"><h3>Subscription</h3></div>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-group"><div class="detail-label">Plan</div><div class="detail-value">' + (shop.plan || 'BASIC') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Status</div><div class="detail-value">' + (shop.subscriptionStatus || 'NONE') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Start Date</div><div class="detail-value">' + formatDate(shop.subscriptionStartDate) + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Expiry Date</div><div class="detail-value">' + formatDate(shop.subscriptionExpiryDate) + '</div></div>';
+            html += '</div></div>';
+
+            // Rejection reason (if rejected)
+            if (shop.rejectionReason) {
+                html += '<div class="alert alert-danger mb-6"><strong>Rejection Reason:</strong> ' + shop.rejectionReason + '</div>';
+            }
+
+            document.getElementById('shopDetailContent').innerHTML = html;
+        }
+
+        function formatBusinessType(type) {
+            if (!type) return '—';
+            return type.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+        }
+
+        function formatLinkedAccountStatus(linkedAccountId) {
+            if (!linkedAccountId) {
+                return '<span class="badge badge-warning">Not created yet</span>';
+            }
+            if (linkedAccountId.indexOf('acc_pending_') === 0) {
+                return '<span class="badge badge-warning">Pending (test mode / retry needed)</span>';
+            }
+            return '<span class="badge badge-success">' + linkedAccountId + '</span>';
+        }
+
+        loadShopDetail();
+    </script>
+</body>
+
+</html>

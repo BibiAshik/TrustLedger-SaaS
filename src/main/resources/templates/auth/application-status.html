@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Status — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+
+    <div class="register-page">
+        <div class="register-card application-status-card">
+            <div class="logo">
+                <img src="/images/logo-light.png" alt="Trust Ledger">
+            </div>
+            <h1>Application Status</h1>
+            <p class="subtitle" id="statusSubtitle">Tracking your shop registration with Trust Ledger</p>
+
+            <div id="statusLoading" class="loading-overlay">
+                <div class="spinner spinner-lg"></div>
+                <p>Loading your application status...</p>
+            </div>
+
+            <div id="statusContent" style="display:none;">
+                <div class="status-shop-name" id="shopNameDisplay"></div>
+                <p class="text-sm text-muted text-center mb-6" id="emailDisplay"></p>
+
+                <div class="status-tracker">
+                    <div class="status-step" id="step1">
+                        <div class="status-step-icon">1</div>
+                        <div class="status-step-body">
+                            <div class="status-step-title">Application Sent &amp; Received</div>
+                            <div class="status-step-desc">Your registration has been submitted to our team.</div>
+                        </div>
+                    </div>
+                    <div class="status-step" id="step2">
+                        <div class="status-step-icon">2</div>
+                        <div class="status-step-body">
+                            <div class="status-step-title">Application Viewed</div>
+                            <div class="status-step-desc">Our team is reviewing your documents.</div>
+                        </div>
+                    </div>
+                    <div class="status-step" id="step3">
+                        <div class="status-step-icon">3</div>
+                        <div class="status-step-body">
+                            <div class="status-step-title" id="step3Title">Decision</div>
+                            <div class="status-step-desc" id="step3Desc">You will be notified once a decision is made.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rejectionBox" class="alert alert-danger mt-6" style="display:none;"></div>
+                <div id="approvalBox" class="alert alert-success mt-6" style="display:none;"></div>
+
+                <div class="form-actions mt-6">
+                    <a href="/" class="btn btn-gold btn-lg">← Back to Home</a>
+                </div>
+            </div>
+
+            <div id="statusError" style="display:none;" class="text-center mt-4">
+                <p class="text-danger" id="statusErrorMessage"></p>
+                <a href="/" class="btn btn-outline-navy mt-4">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var email = params.get('email');
+
+            if (!email) {
+                document.getElementById('statusLoading').style.display = 'none';
+                document.getElementById('statusError').style.display = 'block';
+                document.getElementById('statusErrorMessage').textContent =
+                    'No email provided. Please register your shop or log in again.';
+                return;
+            }
+
+            loadApplicationStatus(email);
+
+            async function loadApplicationStatus(userEmail) {
+                try {
+                    var data = await publicApiCall(
+                        '/api/auth/shop/application-status?email=' + encodeURIComponent(userEmail),
+                        'GET'
+                    );
+                    renderStatus(data);
+                } catch (error) {
+                    document.getElementById('statusLoading').style.display = 'none';
+                    document.getElementById('statusError').style.display = 'block';
+                    document.getElementById('statusErrorMessage').textContent =
+                        error.message || 'Could not load application status.';
+                }
+            }
+
+            function renderStatus(data) {
+                document.getElementById('statusLoading').style.display = 'none';
+                document.getElementById('statusContent').style.display = 'block';
+
+                document.getElementById('shopNameDisplay').textContent = data.shopName;
+                document.getElementById('emailDisplay').textContent = data.email;
+
+                var step = data.currentStep || 1;
+                markStep('step1', step >= 1, step === 1);
+                markStep('step2', step >= 2, step === 2);
+                markStep('step3', step >= 3, step === 3);
+
+                var rejectionBox = document.getElementById('rejectionBox');
+                var approvalBox = document.getElementById('approvalBox');
+
+                if (data.status === 'REJECTED') {
+                    document.getElementById('step3Title').textContent = 'Application Rejected';
+                    document.getElementById('step3Desc').textContent =
+                        'Your registration was not approved at this time.';
+                    rejectionBox.style.display = 'block';
+                    rejectionBox.innerHTML = '<strong>Rejection Reason:</strong> ' +
+                        (data.rejectionReason || 'No reason provided.');
+                } else if (data.status === 'APPROVED' || data.status === 'ACTIVE') {
+                    document.getElementById('step3Title').textContent = 'Application Successful';
+                    document.getElementById('step3Desc').textContent =
+                        'Your shop has been approved. You can log in and purchase a subscription.';
+                    approvalBox.style.display = 'block';
+                    approvalBox.textContent =
+                        'Congratulations! Your shop is approved. Log in from the homepage to continue.';
+                } else if (step === 2) {
+                    document.getElementById('step3Title').textContent = 'Awaiting Decision';
+                    document.getElementById('step3Desc').textContent =
+                        'Your application is under review. We will email you once decided.';
+                }
+            }
+
+            function markStep(id, completed, active) {
+                var el = document.getElementById(id);
+                el.classList.remove('completed', 'active');
+                if (completed) el.classList.add('completed');
+                if (active) el.classList.add('active');
+            }
+
+            // Refresh every 30 seconds while still pending
+            setInterval(function() {
+                if (email) {
+                    publicApiCall(
+                        '/api/auth/shop/application-status?email=' + encodeURIComponent(email),
+                        'GET'
+                    ).then(renderStatus).catch(function() {});
+                }
+            }, 30000);
+        })();
+    </script>
+</body>
+</html>

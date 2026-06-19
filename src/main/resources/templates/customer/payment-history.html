@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment History — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/tables.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Loans</span></div>
+        <div class="navbar-menu"><button onclick="logout()">Logout</button></div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">My Account</div>
+                <a href="/customer/dashboard"><span class="nav-icon">📊</span> My Loans</a>
+                <a href="/customer/payment-history" class="active"><span class="nav-icon">📜</span> Payment History</a>
+                <a href="/customer/profile"><span class="nav-icon">👤</span> Profile</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📜 Payment History</h1>
+            </div>
+
+            <div id="paymentHistoryContent">
+                <div class="loading-overlay"><div class="spinner spinner-lg"></div><p>Loading payment history...</p></div>
+            </div>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="/customer/dashboard" class="bottom-nav-item"><span class="nav-icon">📊</span> Loans</a>
+            <a href="/customer/payment-history" class="bottom-nav-item active"><span class="nav-icon">📜</span> History</a>
+            <a href="/customer/profile" class="bottom-nav-item"><span class="nav-icon">👤</span> Profile</a>
+        </div>
+    </nav>
+
+    <script src="/js/common.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+
+        async function loadPaymentHistory(page) {
+            page = page || 0;
+            showLoading('paymentHistoryContent');
+            try {
+                var data = await apiCall('/api/customer/payments?page=' + page + '&size=15', 'GET');
+                renderPaymentHistory(data);
+            } catch (error) {
+                showToast('Failed to load payment history.', 'danger');
+            }
+        }
+
+        function renderPaymentHistory(pageData) {
+            var container = document.getElementById('paymentHistoryContent');
+
+            if (!pageData.content || pageData.content.length === 0) {
+                showEmptyState('paymentHistoryContent', 'No payments found yet.', '📜');
+                return;
+            }
+
+            var html = '<div class="data-table-container">' +
+                '<table class="data-table payment-table data-table-responsive"><thead><tr>' +
+                '<th>Date</th><th>Loan ID</th><th>Mode</th><th>Amount</th><th>Receipt</th>' +
+                '</tr></thead><tbody>';
+
+            pageData.content.forEach(function(p) {
+                html += '<tr>' +
+                    '<td data-label="Date">' + formatDate(p.paymentDate) + '</td>' +
+                    '<td data-label="Loan ID"><strong>' + (p.loanDisplayId || '—') + '</strong></td>' +
+                    '<td data-label="Mode"><span class="payment-mode ' + (p.paymentMode === 'CASH' ? 'cash' : 'online') + '">' + p.paymentMode + '</span></td>' +
+                    '<td data-label="Amount" class="td-amount">' + formatCurrency(p.amount) + '</td>' +
+                    '<td data-label="Receipt">' +
+                    (p.receiptNumber ? '<button type="button" onclick="authenticatedDownload(\'/api/customer/payments/' + p.id + '/receipt\', \'receipt-' + p.receiptNumber + '.pdf\')" class="btn btn-sm btn-outline">📄 PDF</button>' : '—') +
+                    '</td></tr>';
+            });
+
+            html += '</tbody></table></div>';
+            html += buildPagination(pageData, 'loadPaymentHistory');
+            container.innerHTML = html;
+        }
+
+        loadPaymentHistory(0);
+    </script>
+</body>
+</html>

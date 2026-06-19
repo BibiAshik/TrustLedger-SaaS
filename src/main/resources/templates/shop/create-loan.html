@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Loan — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/forms.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Shop</span></div>
+        <div class="navbar-menu"><button onclick="logout()">Logout</button></div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
+                <a href="/shop/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="sidebar-section-title">Customers</div>
+                <a href="/shop/customers"><span class="nav-icon">👤</span> All Customers</a>
+                <a href="/shop/add-customer"><span class="nav-icon">➕</span> Add Customer</a>
+                <div class="sidebar-section-title">Loans</div>
+                <a href="/shop/loans"><span class="nav-icon">📋</span> All Loans</a>
+                <a href="/shop/create-loan" class="active"><span class="nav-icon">➕</span> Create Loan</a>
+                <a href="/shop/overdue-loans"><span class="nav-icon">⚠️</span> Overdue Loans</a>
+                <div class="sidebar-section-title">Account</div>
+                <a href="/shop/settings"><span class="nav-icon">⚙️</span> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <a href="/shop/loans" class="text-sm" style="color:var(--gray-500);">← Back to Loans</a>
+                    <h1>Create New Loan</h1>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <form id="createLoanForm" onsubmit="handleCreateLoan(event)">
+
+                    <div class="form-section-title">Loan Details</div>
+
+                    <div class="form-group">
+                        <label>Select Customer <span class="required">*</span></label>
+                        <select name="customerId" id="customerSelect" class="form-select" required>
+                            <option value="">Loading customers...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Loan Amount (₹) <span class="required">*</span></label>
+                            <input type="number" name="loanAmount" class="form-input" placeholder="e.g. 25000" step="0.01" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Interest Rate (% per month) <span class="required">*</span></label>
+                            <input type="number" name="interestRate" class="form-input" placeholder="e.g. 2" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Loan Date <span class="required">*</span></label>
+                            <input type="date" name="loanDate" id="loanDate" class="form-input" required>
+                            <p class="form-help">Cannot be a past date (per section 7.3)</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Due Date <span class="required">*</span></label>
+                            <input type="date" name="dueDate" id="dueDate" class="form-input" required>
+                            <p class="form-help">Auto-set to +3 months from loan date (editable)</p>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">Gold Item Details</div>
+                    <p class="text-sm text-muted mb-4">One loan per gold item. For multiple items, create separate loans.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Gold Item Type <span class="required">*</span></label>
+                            <select name="goldItemType" id="goldItemType" class="form-select" onchange="toggleOtherItem(this)" required>
+                                <option value="">Select type</option>
+                                <option value="Gold Chain">Gold Chain</option>
+                                <option value="Gold Ring">Gold Ring</option>
+                                <option value="Gold Bangle">Gold Bangle</option>
+                                <option value="Gold Necklace">Gold Necklace</option>
+                                <option value="Gold Bracelet">Gold Bracelet</option>
+                                <option value="Gold Earrings">Gold Earrings</option>
+                                <option value="Gold Coin">Gold Coin</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="otherItemGroup" style="display:none;">
+                            <label>Specify Item <span class="required">*</span></label>
+                            <input type="text" name="goldItemDescription" id="otherItemInput" class="form-input" placeholder="Describe the gold item">
+                        </div>
+                    </div>
+
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Gold Weight (grams) <span class="required">*</span></label>
+                            <input type="number" name="goldWeight" class="form-input" placeholder="e.g. 10.5" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gold Purity <span class="required">*</span></label>
+                            <select name="goldPurity" class="form-select" required>
+                                <option value="">Select purity</option>
+                                <option value="24K">24K</option>
+                                <option value="22K">22K</option>
+                                <option value="20K">20K</option>
+                                <option value="18K">18K</option>
+                                <option value="14K">14K</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated Value (₹) <span class="required">*</span></label>
+                            <input type="number" name="estimatedValue" class="form-input" placeholder="e.g. 50000" step="0.01" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/shop/loans" class="btn btn-outline-navy">Cancel</a>
+                        <button type="submit" class="btn btn-gold btn-lg">Create Loan</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+
+        // Set loan date to today and due date to +3 months
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('loanDate').value = today;
+        document.getElementById('loanDate').min = today;
+
+        var dueDate = new Date();
+        dueDate.setMonth(dueDate.getMonth() + 3);
+        document.getElementById('dueDate').value = dueDate.toISOString().split('T')[0];
+
+        // Auto-update due date when loan date changes
+        document.getElementById('loanDate').addEventListener('change', function() {
+            var d = new Date(this.value);
+            d.setMonth(d.getMonth() + 3);
+            document.getElementById('dueDate').value = d.toISOString().split('T')[0];
+        });
+
+        // Show/hide "Others" text input
+        function toggleOtherItem(select) {
+            var otherGroup = document.getElementById('otherItemGroup');
+            var otherInput = document.getElementById('otherItemInput');
+            if (select.value === 'Others') {
+                otherGroup.style.display = 'block';
+                otherInput.required = true;
+            } else {
+                otherGroup.style.display = 'none';
+                otherInput.required = false;
+            }
+        }
+
+        // Load customers for the dropdown
+        async function loadCustomerDropdown() {
+            try {
+                var data = await apiCall('/api/shop/customers?page=0&size=200', 'GET');
+                var select = document.getElementById('customerSelect');
+                select.innerHTML = '<option value="">Select a customer</option>';
+                data.content.forEach(function(c) {
+                    select.innerHTML += '<option value="' + c.id + '">' + c.fullName + ' — ' + c.phone + '</option>';
+                });
+            } catch (error) {
+                showToast('Failed to load customers.', 'danger');
+            }
+        }
+
+        async function handleCreateLoan(event) {
+            event.preventDefault();
+            var form = event.target;
+            var formData = new FormData(form);
+            var body = {};
+            formData.forEach(function(val, key) { body[key] = val; });
+
+            // If "Others", use the description field; otherwise use the dropdown value
+            if (body.goldItemType !== 'Others') {
+                body.goldItemDescription = body.goldItemType;
+            }
+
+            var submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Creating...';
+
+            try {
+                var data = await apiCall('/api/shop/loans', 'POST', body);
+                showToast('Loan created: ' + data.loanId, 'success');
+                setTimeout(function() { window.location.href = '/shop/loans/' + data.id; }, 1500);
+            } catch (error) {
+                showToast('Failed to create loan.', 'danger');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Create Loan';
+            }
+        }
+
+        loadCustomerDropdown();
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Access — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/forms.css">
+    <!-- No meta robots — this page should not be indexed -->
+    <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+
+    <!--
+        HIDDEN ADMIN LOGIN PAGE
+        Per section 16.3: "The admin login page is a hidden page (no nav link).
+        The user only reaches it by typing /admin/login directly."
+    -->
+    <div class="admin-login-page">
+        <div class="admin-login-card">
+            <img src="/images/logo-light.png" alt="Trust Ledger" style="height:48px;margin:0 auto var(--space-6);">
+            <h2>Super Admin Login</h2>
+            <p class="text-sm text-muted mb-6">Authorized personnel only</p>
+
+            <form onsubmit="handleLogin(event)" style="text-align:left;">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-input" placeholder="admin@trustledger.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="Enter password" required>
+                </div>
+                <div id="loginError" class="error-message"></div>
+                <button type="submit" class="btn btn-navy btn-block btn-lg">Login</button>
+            </form>
+
+            <div style="margin-top:var(--space-6);text-align:center;">
+                <a href="/" class="text-sm" style="color:var(--gray-400);">← Back to homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

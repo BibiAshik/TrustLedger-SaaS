@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Detail — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/tables.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Shop</span></div>
+        <div class="navbar-menu"><button onclick="logout()">Logout</button></div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
+                <a href="/shop/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="sidebar-section-title">Customers</div>
+                <a href="/shop/customers" class="active"><span class="nav-icon">👤</span> All Customers</a>
+                <a href="/shop/add-customer"><span class="nav-icon">➕</span> Add Customer</a>
+                <div class="sidebar-section-title">Loans</div>
+                <a href="/shop/loans"><span class="nav-icon">📋</span> All Loans</a>
+                <a href="/shop/create-loan"><span class="nav-icon">➕</span> Create Loan</a>
+                <a href="/shop/overdue-loans"><span class="nav-icon">⚠️</span> Overdue Loans</a>
+                <div class="sidebar-section-title">Account</div>
+                <a href="/shop/settings"><span class="nav-icon">⚙️</span> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <a href="/shop/customers" class="text-sm" style="color:var(--gray-500);">← Back to Customers</a>
+                    <h1 id="customerTitle">Customer Detail</h1>
+                </div>
+                <button class="btn btn-blue btn-sm" onclick="resetCustomerPassword()">🔑 Reset Password</button>
+            </div>
+            <div id="customerDetailContent">
+                <div class="loading-overlay"><div class="spinner spinner-lg"></div><p>Loading...</p></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+
+        var pathParts = window.location.pathname.split('/');
+        var customerId = pathParts[pathParts.length - 1];
+
+        async function loadCustomerDetail() {
+            showLoading('customerDetailContent');
+            try {
+                var customer = await apiCall('/api/shop/customers/' + customerId, 'GET');
+                var loans = await apiCall('/api/shop/customers/' + customerId + '/loans', 'GET');
+                renderCustomerDetail(customer, loans || []);
+            } catch (error) {
+                showToast('Failed to load customer.', 'danger');
+                showEmptyState('customerDetailContent', 'Could not load this customer. Please refresh after logging in again.', '!');
+            }
+        }
+
+        function renderCustomerDetail(c, loans) {
+            document.getElementById('customerTitle').textContent = c.fullName;
+
+            var html = '<div class="card mb-6"><div class="card-header"><h3>Customer Profile</h3></div>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-group"><div class="detail-label">Full Name</div><div class="detail-value">' + c.fullName + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Phone</div><div class="detail-value">' + c.phone + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Email</div><div class="detail-value">' + c.email + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Date of Birth</div><div class="detail-value">' + formatDate(c.dateOfBirth) + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Gender</div><div class="detail-value">' + (c.gender || '—') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Address</div><div class="detail-value">' + c.address + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Aadhaar</div><div class="detail-value">' + (c.maskedAadhaarNumber || 'XXXX XXXX XXXX') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">PAN</div><div class="detail-value">' + (c.panNumber || '—') + '</div></div>';
+            html += '</div></div>';
+
+            // Loans section
+            html += '<div class="section-card"><div class="section-header"><h3>Loans (' + loans.length + ')</h3>' +
+                '<a href="/shop/create-loan" class="btn btn-sm btn-gold">+ New Loan</a></div><div class="section-body">';
+
+            if (loans.length === 0) {
+                html += '<p class="text-muted text-center p-4">No loans for this customer yet.</p>';
+            } else {
+                html += '<table class="data-table"><thead><tr><th>Loan ID</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Balance</th></tr></thead><tbody>';
+                loans.forEach(function(loan) {
+                    html += '<tr class="clickable" onclick="window.location.href=\'/shop/loans/' + loan.id + '\'">' +
+                        '<td><strong>' + loan.loanId + '</strong></td>' +
+                        '<td>' + formatCurrency(loan.loanAmount) + '</td>' +
+                        '<td>' + formatDate(loan.dueDate) + '</td>' +
+                        '<td>' + getStatusBadge(loan.status) + '</td>' +
+                        '<td class="td-amount">' + formatCurrency(loan.balanceDue) + '</td></tr>';
+                });
+                html += '</tbody></table>';
+            }
+            html += '</div></div>';
+
+            document.getElementById('customerDetailContent').innerHTML = html;
+        }
+
+        async function resetCustomerPassword() {
+            if (!confirm('Generate a new password for this customer?')) return;
+            try {
+                var data = await apiCall('/api/shop/customers/' + customerId + '/reset-password', 'POST');
+                alert('New password generated: ' + data.newPassword + '\n\nRelay this to the customer.');
+                showToast('Password reset successfully.', 'success');
+            } catch (error) {
+                showToast('Failed to reset password.', 'danger');
+            }
+        }
+
+        loadCustomerDetail();
+    </script>
+</body>
+</html>

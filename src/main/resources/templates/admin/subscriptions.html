@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Revenue — Trust Ledger Admin</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/tables.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="/images/logo-light.png" alt="Trust Ledger">
+            <span>Admin Panel</span>
+        </div>
+        <div class="navbar-menu">
+            <span class="text-sm text-muted">Super Admin</span>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
+                <a href="/admin/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+                <div class="sidebar-section-title">Shop Management</div>
+                <a href="/admin/shop-approvals"><span class="nav-icon">⏳</span> Pending Approvals</a>
+                <a href="/admin/shops"><span class="nav-icon">🏪</span> All Shops</a>
+                <div class="sidebar-section-title">Revenue</div>
+                <a href="/admin/subscriptions" class="active"><span class="nav-icon">💰</span> Subscription Revenue</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1>Subscription Revenue Log</h1>
+                    <p class="breadcrumb">Track all subscription payments from shops</p>
+                </div>
+            </div>
+
+            <div id="revenueContent">
+                <div class="loading-overlay">
+                    <div class="spinner spinner-lg"></div>
+                    <p>Loading revenue data...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="/admin/dashboard" class="bottom-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/admin/shop-approvals" class="bottom-nav-item"><span class="nav-icon">⏳</span> Approvals</a>
+            <a href="/admin/shops" class="bottom-nav-item"><span class="nav-icon">🏪</span> Shops</a>
+            <a href="/admin/subscriptions" class="bottom-nav-item active"><span class="nav-icon">💰</span> Revenue</a>
+        </div>
+    </nav>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+
+        async function loadRevenue(page) {
+            page = page || 0;
+            showLoading('revenueContent');
+            try {
+                var data = await apiCall('/api/admin/subscriptions?page=' + page + '&size=15', 'GET');
+                renderRevenue(data);
+            } catch (error) {
+                showToast('Failed to load revenue data.', 'danger');
+            }
+        }
+
+        function renderRevenue(pageData) {
+            var container = document.getElementById('revenueContent');
+            if (!pageData.content || pageData.content.length === 0) {
+                showEmptyState('revenueContent', 'No subscription payments yet.', '💰');
+                return;
+            }
+
+            var html = '<div class="data-table-container">' +
+                '<table class="data-table revenue-table data-table-responsive"><thead><tr>' +
+                '<th>Date</th><th>Shop Name</th><th>Plan</th><th>Amount</th><th>Razorpay ID</th>' +
+                '</tr></thead><tbody>';
+
+            pageData.content.forEach(function(p) {
+                html += '<tr>' +
+                    '<td data-label="Date">' + formatDate(p.paymentDate) + '</td>' +
+                    '<td data-label="Shop">' + p.shopName + '</td>' +
+                    '<td data-label="Plan"><span class="badge badge-' + (p.planType || 'basic').toLowerCase() + '">' + p.planType + '</span></td>' +
+                    '<td data-label="Amount" class="td-amount">' + formatCurrency(p.amount) + '</td>' +
+                    '<td data-label="Razorpay ID" class="text-sm text-muted">' + (p.razorpayPaymentId || '—') + '</td>' +
+                    '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            html += buildPagination(pageData, 'loadRevenue');
+            container.innerHTML = html;
+        }
+
+        loadRevenue(0);
+    </script>
+</body>
+</html>

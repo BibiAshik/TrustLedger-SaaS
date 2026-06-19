@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Customer - Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/forms.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Shop</span></div>
+        <div class="navbar-menu"><button onclick="logout()">Logout</button></div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
+                <a href="/shop/dashboard"><span class="nav-icon">[D]</span> Dashboard</a>
+                <div class="sidebar-section-title">Customers</div>
+                <a href="/shop/customers"><span class="nav-icon">[C]</span> All Customers</a>
+                <a href="/shop/add-customer" class="active"><span class="nav-icon">+</span> Add Customer</a>
+                <div class="sidebar-section-title">Loans</div>
+                <a href="/shop/loans"><span class="nav-icon">[L]</span> All Loans</a>
+                <a href="/shop/create-loan"><span class="nav-icon">+</span> Create Loan</a>
+                <a href="/shop/overdue-loans"><span class="nav-icon">!</span> Overdue Loans</a>
+                <div class="sidebar-section-title">Account</div>
+                <a href="/shop/settings"><span class="nav-icon">[S]</span> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <a href="/shop/customers" class="text-sm" style="color:var(--gray-500);">Back to Customers</a>
+                    <h1>Add New Customer</h1>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <form id="addCustomerForm" onsubmit="handleAddCustomer(event)">
+
+                    <div class="form-section-title">Personal Information</div>
+
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" name="fullName" class="form-input" placeholder="Customer's full name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="tel" name="phone" class="form-input" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address <span class="optional">(Optional)</span></label>
+                            <input type="email" name="email" class="form-input" placeholder="customer@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date of Birth <span class="required">*</span></label>
+                            <input type="date" name="dateOfBirth" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender <span class="required">*</span></label>
+                            <select name="gender" class="form-select" required>
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Address <span class="required">*</span></label>
+                        <textarea name="address" class="form-textarea" rows="2" placeholder="Full address" required></textarea>
+                    </div>
+
+                    <div class="form-section-title">ID Verification</div>
+
+                    <div class="form-group">
+                        <label>Aadhaar Number <span class="required">*</span></label>
+                        <input type="text" name="aadhaarNumber" class="form-input" placeholder="12-digit Aadhaar number" pattern="[0-9]{12}" required>
+                        <p class="form-help">This will be stored securely. Only last 4 digits will ever be displayed.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>PAN Number <span class="required">*</span></label>
+                        <input type="text" name="panNumber" class="form-input" placeholder="e.g. ABCDE1234F" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" style="text-transform:uppercase;" required>
+                    </div>
+
+                    <div id="credentialsDisplay" class="alert alert-success" style="display:none;">
+                        <div>
+                            <strong>Customer Created Successfully!</strong>
+                            <p class="mb-2">Login credentials (relay to customer):</p>
+                            <p><strong>Login:</strong> <span id="generatedLogin"></span></p>
+                            <p><strong>Password:</strong> <span id="generatedPassword"></span></p>
+                            <p class="text-xs text-muted mt-2">Credentials are sent by SMS. Email is also used when an address is provided.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/shop/customers" class="btn btn-outline-navy">Cancel</a>
+                        <button type="submit" class="btn btn-gold btn-lg">Add Customer</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="/shop/dashboard" class="bottom-nav-item"><span class="nav-icon">[D]</span> Home</a>
+            <a href="/shop/customers" class="bottom-nav-item"><span class="nav-icon">[C]</span> Customers</a>
+            <a href="/shop/loans" class="bottom-nav-item"><span class="nav-icon">[L]</span> Loans</a>
+            <a href="/shop/settings" class="bottom-nav-item"><span class="nav-icon">[S]</span> Settings</a>
+        </div>
+    </nav>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+
+        async function handleAddCustomer(event) {
+            event.preventDefault();
+            var form = event.target;
+            var submitBtn = form.querySelector('button[type="submit"]');
+
+            var panInput = form.querySelector('input[name="panNumber"]');
+            var panValue = panInput ? panInput.value.trim().toUpperCase() : '';
+            if (panInput) panInput.value = panValue;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Adding...';
+
+            var payload = {
+                fullName: form.querySelector('[name="fullName"]').value.trim(),
+                phone: form.querySelector('[name="phone"]').value.trim(),
+                email: form.querySelector('[name="email"]').value.trim() || null,
+                dateOfBirth: form.querySelector('[name="dateOfBirth"]').value,
+                gender: form.querySelector('[name="gender"]').value,
+                address: form.querySelector('[name="address"]').value.trim(),
+                aadhaarNumber: form.querySelector('[name="aadhaarNumber"]').value.trim(),
+                panNumber: panValue
+            };
+
+            try {
+                var response = await fetch('/api/shop/customers', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + getToken(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                var data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('generatedLogin').textContent = data.login || data.phone;
+                    document.getElementById('generatedPassword').textContent = data.generatedPassword || 'GOLD' + (data.phone || '').slice(-4);
+                    document.getElementById('credentialsDisplay').style.display = 'flex';
+                    submitBtn.style.display = 'none';
+                    showToast('Customer added successfully!', 'success');
+                } else {
+                    showToast(data.message || 'Failed to add customer.', 'danger');
+                }
+            } catch (error) {
+                showToast('Failed to add customer. Please try again.', 'danger');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Add Customer';
+            }
+        }
+    </script>
+</body>
+</html>

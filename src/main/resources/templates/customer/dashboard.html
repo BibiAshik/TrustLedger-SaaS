@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Loans — Trust Ledger</title>
+    <link rel="icon" href="/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/tables.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="/images/logo-light.png" alt="Trust Ledger">
+            <span id="customerName">My Loans</span>
+        </div>
+        <div class="navbar-menu">
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">My Account</div>
+                <a href="/customer/dashboard" class="active"><span class="nav-icon">📊</span> My Loans</a>
+                <a href="/customer/payment-history"><span class="nav-icon">📜</span> Payment History</a>
+                <a href="/customer/profile"><span class="nav-icon">👤</span> Profile</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1>My Loans</h1>
+                    <p class="breadcrumb">View your active and past gold loans</p>
+                </div>
+            </div>
+
+            <div id="dashboardContent">
+                <div class="loading-overlay"><div class="spinner spinner-lg"></div><p>Loading your loans...</p></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="/customer/dashboard" class="bottom-nav-item active"><span class="nav-icon">📊</span> Loans</a>
+            <a href="/customer/payment-history" class="bottom-nav-item"><span class="nav-icon">📜</span> History</a>
+            <a href="/customer/profile" class="bottom-nav-item"><span class="nav-icon">👤</span> Profile</a>
+        </div>
+    </nav>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script>
+        if (!requireAuth()) { /* redirects */ }
+        loadCustomerDashboard();
+    </script>
+</body>
+</html>
