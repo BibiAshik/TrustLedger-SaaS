@@ -97,7 +97,7 @@ public class ShopController {
             @Valid @RequestBody CustomerCreateRequestDTO dto) {
 
         Long shopId = extractShopId(authHeader);
-        Map<String, Object> result = customerService.createCustomer(dto, shopId, null, null);
+        Map<String, Object> result = customerService.createCustomer(dto, shopId, null);
         return ResponseEntity.ok(result);
     }
 

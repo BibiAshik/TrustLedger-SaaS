@@ -29,8 +29,7 @@ public class CustomerMapper {
                 .gender(customer.getGender())
                 .address(customer.getAddress())
                 .maskedAadhaarNumber(maskAadhaarNumber(customer.getAadhaarNumber()))
-                .aadhaarFrontPath(customer.getAadhaarFrontPath())
-                .customerPhotoPath(customer.getCustomerPhotoPath())
+                .aadhaarFrontPath(formatUrl(customer.getAadhaarFrontPath()))
                 .panNumber(customer.getPanNumber())
                 .shopName(customer.getShop() != null ? customer.getShop().getShopName() : null)
                 .shopId(customer.getShop() != null ? customer.getShop().getId() : null)
@@ -60,5 +59,13 @@ public class CustomerMapper {
 
         // Return in the masked format: "XXXX XXXX 1234"
         return "XXXX XXXX " + lastFourDigits;
+    }
+
+    /**
+     * Prefixes the relative file path with /uploads/ to make it a browser-usable URL.
+     */
+    private static String formatUrl(String path) {
+        if (path == null || path.isEmpty()) return null;
+        return path.startsWith("/uploads/") ? path : "/uploads/" + path;
     }
 }

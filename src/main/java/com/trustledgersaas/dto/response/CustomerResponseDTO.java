@@ -35,7 +35,6 @@ public class CustomerResponseDTO {
     private String maskedAadhaarNumber;
 
     private String aadhaarFrontPath;
-    private String customerPhotoPath;
     private String panNumber;
     private String shopName;
     private Long shopId;

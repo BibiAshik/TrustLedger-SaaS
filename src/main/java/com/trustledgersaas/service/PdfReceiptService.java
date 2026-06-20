@@ -1,24 +1,33 @@
 package com.trustledgersaas.service;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.trustledgersaas.entity.GoldLoan;
 import com.trustledgersaas.entity.Payment;
 import com.trustledgersaas.repository.PaymentRepository;
+import com.trustledgersaas.util.InterestCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * PdfReceiptService generates simple PDF receipts without an external library.
- *
- * This local implementation keeps the project dependency-light and compileable.
- * It creates a basic single-page PDF containing receipt text. Later, this can be
- * upgraded to iText/PDFBox for richer tables and logo images.
- */
 @Service
 @Slf4j
 public class PdfReceiptService {
@@ -26,123 +35,181 @@ public class PdfReceiptService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    /**
-     * Purpose: Generate a payment receipt PDF for one payment.
-     * Input: The Payment entity selected by customer/shop.
-     * Output: PDF bytes for browser download.
-     */
+    private static final Font FONT_TITLE = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+    private static final Font FONT_HEADER = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
+    private static final Font FONT_NORMAL = FontFactory.getFont(FontFactory.HELVETICA, 12);
+    private static final Font FONT_BOLD = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+    private static final Font FONT_SMALL_ITALIC = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8);
+
     public byte[] generatePaymentReceipt(Payment payment) {
         GoldLoan loan = payment.getGoldLoan();
-        StringBuilder text = new StringBuilder();
-        text.append("Trust Ledger - Protect Gold. Preserve Trust.\n\n");
-        text.append("Payment Receipt\n");
-        text.append("Receipt Number: ").append(payment.getReceiptNumber()).append("\n");
-        text.append("Payment Date: ").append(payment.getPaymentDate()).append("\n");
-        text.append("Amount Paid: Rs. ").append(payment.getAmount()).append("\n");
-        text.append("Payment Mode: ").append(payment.getPaymentMode()).append("\n\n");
-        text.append("Loan ID: ").append(loan.getLoanId()).append("\n");
-        text.append("Customer: ").append(loan.getCustomer().getFullName()).append("\n");
-        text.append("Gold Item: ").append(loan.getGoldItemType()).append("\n");
-        text.append("Shop: ").append(loan.getShop().getShopName()).append("\n");
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Document document = new Document();
+            PdfWriter.getInstance(document, out);
+            document.open();
 
-        log.info("Generated simple payment receipt for {}", payment.getReceiptNumber());
-        return buildSimplePdf(text.toString());
-    }
+            addHeader(document, loan.getShop().getShopName(), loan.getShop().getAddress(), loan.getShop().getPhone());
 
-    /**
-     * Purpose: Generate a final closure receipt PDF for a closed loan.
-     * Input: The GoldLoan entity being closed.
-     * Output: PDF bytes for browser download.
-     */
-    public byte[] generateClosureReceipt(GoldLoan loan) {
-        StringBuilder text = new StringBuilder();
-        text.append("Trust Ledger - Protect Gold. Preserve Trust.\n\n");
-        text.append("LOAN CLOSED - FULL AND FINAL SETTLEMENT\n\n");
-        text.append("Loan ID: ").append(loan.getLoanId()).append("\n");
-        text.append("Customer: ").append(loan.getCustomer().getFullName()).append("\n");
-        text.append("Principal Amount: Rs. ").append(loan.getLoanAmount()).append("\n");
-        text.append("Interest Rate: ").append(loan.getInterestRate()).append("% per month\n");
-        text.append("Loan Date: ").append(loan.getLoanDate()).append("\n");
-        text.append("Closure Date: ").append(LocalDate.now()).append("\n");
-        text.append("Gold Item Returned: ").append(loan.getGoldItemType()).append("\n\n");
-        text.append("Payment History:\n");
+            Paragraph title = new Paragraph("PAYMENT RECEIPT", FONT_TITLE);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(20);
+            document.add(title);
 
-        List<Payment> payments = paymentRepository.findByGoldLoanIdOrderByPaymentDateDesc(loan.getId());
-        if (payments.isEmpty()) {
-            text.append("No payments recorded.\n");
-        } else {
-            for (Payment payment : payments) {
-                text.append(payment.getPaymentDate())
-                        .append(" | ")
-                        .append(payment.getReceiptNumber())
-                        .append(" | ")
-                        .append(payment.getPaymentMode())
-                        .append(" | Rs. ")
-                        .append(payment.getAmount())
-                        .append("\n");
-            }
-        }
+            BigDecimal totalInterest = InterestCalculator.calculateTotalInterestAccrued(loan.getLoanAmount(), loan.getInterestRate(), loan.getLoanDate());
+            BigDecimal totalPaid = paymentRepository.findByGoldLoanIdOrderByPaymentDateDesc(loan.getId())
+                    .stream().map(Payment::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal balance = loan.getLoanAmount().add(totalInterest).subtract(totalPaid);
+            if(balance.compareTo(BigDecimal.ZERO) < 0) balance = BigDecimal.ZERO;
 
-        log.info("Generated simple closure receipt for {}", loan.getLoanId());
-        return buildSimplePdf(text.toString());
-    }
+            PdfPTable table = new PdfPTable(2);
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(10f);
+            table.setSpacingAfter(10f);
+            
+            addRow(table, "Receipt Number:", payment.getReceiptNumber());
+            addRow(table, "Payment Date:", payment.getPaymentDate().toString());
+            addRow(table, "Customer Name:", loan.getCustomer().getFullName());
+            addRow(table, "Customer Phone:", loan.getCustomer().getPhone());
+            addRow(table, "Loan ID:", loan.getLoanId());
+            addRow(table, "Gold Item:", loan.getGoldItemType() + " (" + loan.getGoldWeight() + "g, " + loan.getGoldPurity() + ")");
+            addRow(table, "Interest Rate:", loan.getInterestRate() + "% per month");
+            addRow(table, "Amount Paid:", "Rs. " + payment.getAmount());
+            addRow(table, "Payment Mode:", payment.getPaymentMode());
+            addRow(table, "Balance Remaining:", "Rs. " + balance);
+            
+            document.add(table);
 
-    /**
-     * Purpose: Build a minimal valid PDF containing plain text.
-     * Input: Text lines to place on the PDF page.
-     * Output: Complete PDF document bytes.
-     */
-    private byte[] buildSimplePdf(String text) {
-        String escapedText = escapePdfText(text).replace("\n", ") Tj T* (");
-        String stream = "BT /F1 11 Tf 50 780 Td 14 TL (" + escapedText + ") Tj ET";
-
-        String object1 = "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n";
-        String object2 = "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n";
-        String object3 = "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] "
-                + "/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj\n";
-        String object4 = "4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\n";
-        String object5 = "5 0 obj << /Length " + stream.getBytes(StandardCharsets.UTF_8).length
-                + " >> stream\n" + stream + "\nendstream endobj\n";
-
-        try {
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            output.write("%PDF-1.4\n".getBytes(StandardCharsets.UTF_8));
-
-            int xref1 = output.size();
-            output.write(object1.getBytes(StandardCharsets.UTF_8));
-            int xref2 = output.size();
-            output.write(object2.getBytes(StandardCharsets.UTF_8));
-            int xref3 = output.size();
-            output.write(object3.getBytes(StandardCharsets.UTF_8));
-            int xref4 = output.size();
-            output.write(object4.getBytes(StandardCharsets.UTF_8));
-            int xref5 = output.size();
-            output.write(object5.getBytes(StandardCharsets.UTF_8));
-            int xrefStart = output.size();
-
-            String xref = "xref\n0 6\n0000000000 65535 f \n"
-                    + formatXref(xref1) + " 00000 n \n"
-                    + formatXref(xref2) + " 00000 n \n"
-                    + formatXref(xref3) + " 00000 n \n"
-                    + formatXref(xref4) + " 00000 n \n"
-                    + formatXref(xref5) + " 00000 n \n"
-                    + "trailer << /Size 6 /Root 1 0 R >>\nstartxref\n"
-                    + xrefStart + "\n%%EOF";
-            output.write(xref.getBytes(StandardCharsets.UTF_8));
-            return output.toByteArray();
+            addFooter(document);
+            document.close();
+            return out.toByteArray();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate receipt PDF. Please try again.");
+            log.error("Error generating PDF receipt", e);
+            throw new RuntimeException("Failed to generate PDF receipt", e);
         }
     }
 
-    private String formatXref(int value) {
-        return String.format("%010d", value);
+    public byte[] generateClosureReceipt(GoldLoan loan) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Document document = new Document();
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            addHeader(document, loan.getShop().getShopName(), loan.getShop().getAddress(), loan.getShop().getPhone());
+
+            Paragraph title = new Paragraph("LOAN CLOSED — FULL AND FINAL SETTLEMENT", FONT_TITLE);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(20);
+            document.add(title);
+
+            PdfPTable infoTable = new PdfPTable(2);
+            infoTable.setWidthPercentage(100);
+            infoTable.setSpacingBefore(10f);
+            infoTable.setSpacingAfter(20f);
+            
+            addRow(infoTable, "Loan ID:", loan.getLoanId());
+            addRow(infoTable, "Customer:", loan.getCustomer().getFullName());
+            addRow(infoTable, "Principal Amount:", "Rs. " + loan.getLoanAmount());
+            addRow(infoTable, "Interest Rate:", loan.getInterestRate() + "% per month");
+            addRow(infoTable, "Loan Date:", loan.getLoanDate().toString());
+            addRow(infoTable, "Closure Date:", LocalDate.now().toString());
+            addRow(infoTable, "Gold Item:", loan.getGoldItemType() + " (" + loan.getGoldWeight() + "g)  [RETURNED]");
+            
+            document.add(infoTable);
+
+            Paragraph historyTitle = new Paragraph("Payment History", FONT_HEADER);
+            historyTitle.setSpacingAfter(10);
+            document.add(historyTitle);
+
+            List<Payment> payments = paymentRepository.findByGoldLoanIdOrderByPaymentDateDesc(loan.getId());
+            
+            PdfPTable historyTable = new PdfPTable(4);
+            historyTable.setWidthPercentage(100);
+            historyTable.setWidths(new float[]{2f, 2f, 2f, 2f});
+            
+            addTableHeader(historyTable, "Date");
+            addTableHeader(historyTable, "Amount");
+            addTableHeader(historyTable, "Mode");
+            addTableHeader(historyTable, "Receipt No");
+
+            BigDecimal totalPaid = BigDecimal.ZERO;
+            for (Payment payment : payments) {
+                historyTable.addCell(new Phrase(payment.getPaymentDate().toString(), FONT_NORMAL));
+                historyTable.addCell(new Phrase("Rs. " + payment.getAmount(), FONT_NORMAL));
+                historyTable.addCell(new Phrase(payment.getPaymentMode(), FONT_NORMAL));
+                historyTable.addCell(new Phrase(payment.getReceiptNumber() != null ? payment.getReceiptNumber() : "N/A", FONT_NORMAL));
+                totalPaid = totalPaid.add(payment.getAmount());
+            }
+            
+            document.add(historyTable);
+
+            document.add(new Paragraph(" "));
+            
+            BigDecimal totalInterest = totalPaid.subtract(loan.getLoanAmount());
+            if(totalInterest.compareTo(BigDecimal.ZERO) < 0) totalInterest = BigDecimal.ZERO;
+
+            PdfPTable summaryTable = new PdfPTable(2);
+            summaryTable.setWidthPercentage(100);
+            addRow(summaryTable, "Total Paid:", "Rs. " + totalPaid);
+            addRow(summaryTable, "Total Interest Paid:", "Rs. " + totalInterest);
+            document.add(summaryTable);
+
+            addFooter(document);
+            document.close();
+            return out.toByteArray();
+        } catch (Exception e) {
+            log.error("Error generating PDF closure receipt", e);
+            throw new RuntimeException("Failed to generate PDF receipt", e);
+        }
     }
 
-    private String escapePdfText(String text) {
-        return text.replace("\\", "\\\\")
-                .replace("(", "\\(")
-                .replace(")", "\\)")
-                .replace("\r", "");
+    private void addHeader(Document document, String shopName, String shopAddress, String shopPhone) throws DocumentException {
+        try (InputStream imageStream = getClass().getResourceAsStream("/static/images/logo-light.png")) {
+            if (imageStream != null) {
+                Image logo = Image.getInstance(imageStream.readAllBytes());
+                logo.scaleAbsoluteHeight(40f);
+                logo.scaleAbsoluteWidth(logo.getWidth() * (40f / logo.getHeight()));
+                logo.setAlignment(Element.ALIGN_LEFT);
+                document.add(logo);
+            }
+        } catch (Exception e) {
+            log.warn("Could not load logo for PDF", e);
+        }
+
+        Paragraph name = new Paragraph(shopName != null ? shopName : "Shop", FONT_HEADER);
+        name.setAlignment(Element.ALIGN_RIGHT);
+        document.add(name);
+
+        Paragraph details = new Paragraph((shopAddress != null ? shopAddress : "") + " | Phone: " + (shopPhone != null ? shopPhone : ""), FONT_NORMAL);
+        details.setAlignment(Element.ALIGN_RIGHT);
+        details.setSpacingAfter(20);
+        document.add(details);
+    }
+
+    private void addRow(PdfPTable table, String key, String value) {
+        PdfPCell cellKey = new PdfPCell(new Phrase(key, FONT_BOLD));
+        cellKey.setBorder(Rectangle.NO_BORDER);
+        cellKey.setPaddingBottom(8f);
+        
+        PdfPCell cellValue = new PdfPCell(new Phrase(value != null ? value : "N/A", FONT_NORMAL));
+        cellValue.setBorder(Rectangle.NO_BORDER);
+        cellValue.setPaddingBottom(8f);
+        
+        table.addCell(cellKey);
+        table.addCell(cellValue);
+    }
+    
+    private void addTableHeader(PdfPTable table, String header) {
+        PdfPCell cell = new PdfPCell(new Phrase(header, FONT_BOLD));
+        cell.setPaddingBottom(8f);
+        table.addCell(cell);
+    }
+
+    private void addFooter(Document document) throws DocumentException {
+        document.add(new Paragraph(" "));
+        document.add(new Paragraph(" "));
+        String footerText = "Digitally generated receipt from Trust Ledger on " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        Paragraph footer = new Paragraph(footerText, FONT_SMALL_ITALIC);
+        footer.setAlignment(Element.ALIGN_CENTER);
+        document.add(footer);
     }
 }

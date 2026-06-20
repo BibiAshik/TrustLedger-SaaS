@@ -43,7 +43,7 @@ public class EmailService {
         } catch (Exception e) {
             // Log the error but don't crash the application — email failures
             // should not block the main business flow
-            log.error("Failed to send email to: {} — Error: {}", to, e.getMessage());
+            log.error("Failed to send email to: {}", to, e);
         }
     }
 

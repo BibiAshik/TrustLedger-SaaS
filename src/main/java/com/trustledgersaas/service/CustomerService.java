@@ -88,7 +88,7 @@ public class CustomerService {
      */
     @Transactional
     public Map<String, Object> createCustomer(CustomerCreateRequestDTO dto, Long shopId,
-                                               MultipartFile aadhaarFront, MultipartFile customerPhoto) {
+                                               MultipartFile aadhaarFront) {
 
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
@@ -128,7 +128,6 @@ public class CustomerService {
 
         // Step 5: Save uploaded files
         String aadhaarFrontPath = authService.saveFile(aadhaarFront, "customers/" + user.getId() + "/aadhaar");
-        String customerPhotoPath = authService.saveFile(customerPhoto, "customers/" + user.getId() + "/photo");
 
         // Step 6: Create Customer record
         LocalDate dateOfBirth = null;
@@ -145,7 +144,6 @@ public class CustomerService {
                 .address(dto.getAddress())
                 .aadhaarNumber(dto.getAadhaarNumber())
                 .aadhaarFrontPath(aadhaarFrontPath)
-                .customerPhotoPath(customerPhotoPath)
                 .panNumber(dto.getPanNumber())
                 .shop(shop)
                 .user(user)

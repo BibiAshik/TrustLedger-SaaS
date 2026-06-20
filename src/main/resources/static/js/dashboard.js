@@ -134,8 +134,12 @@ function renderCustomerList(pageData) {
             '</div></div>';
     });
 
-    html += buildPagination(pageData, 'loadCustomers');
     container.innerHTML = html;
+    
+    const paginationContainer = document.getElementById('paginationControls');
+    if (paginationContainer) {
+        paginationContainer.innerHTML = buildPagination(pageData, 'loadCustomers');
+    }
 }
 
 /**
@@ -196,8 +200,12 @@ function renderLoanList(pageData) {
     });
 
     html += '</tbody></table>';
-    html += buildPagination(pageData, 'loadLoans');
     container.innerHTML = html;
+    
+    const paginationContainer = document.getElementById('paginationControls');
+    if (paginationContainer) {
+        paginationContainer.innerHTML = buildPagination(pageData, 'loadLoans');
+    }
 }
 
 // ==================== LOAN DETAIL ====================
@@ -471,14 +479,23 @@ function renderShopList(pageData, isPending) {
             '<td data-label="Plan"><span class="badge badge-' + (shop.plan || 'basic').toLowerCase() + '">' + (shop.plan || 'BASIC') + '</span></td>' +
             '<td data-label="Status">' + getStatusBadge(shop.status) + '</td>' +
             '<td data-label="Registered">' + formatDate(shop.createdAt) + '</td>' +
-            '<td><button class="btn btn-sm btn-success" onclick="approveShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">Approve</button> ' +
-            '<button class="btn btn-sm btn-danger" onclick="rejectShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">Reject</button> ' +
-            '<a href="/admin/shops/' + shop.id + '" class="btn btn-sm btn-outline">Review</a></td></tr>';
+            '<td>';
+            
+        if (isPending) {
+            html += '<button class="btn btn-sm btn-success" onclick="approveShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">Approve</button> ' +
+            '<button class="btn btn-sm btn-danger" onclick="rejectShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">Reject</button> ';
+        }
+            
+        html += '<a href="/admin/shops/' + shop.id + '" class="btn btn-sm btn-outline">Review</a></td></tr>';
     });
 
     html += '</tbody></table>';
-    html += buildPagination(pageData, isPending ? 'loadPendingShops' : 'loadAllShops');
     container.innerHTML = html;
+    
+    const paginationContainer = document.getElementById('paginationControls');
+    if (paginationContainer) {
+        paginationContainer.innerHTML = buildPagination(pageData, isPending ? 'loadPendingShops' : 'loadAllShops');
+    }
 }
 
 let approveShopTargetId = null;

@@ -123,11 +123,21 @@
 
             // Uploaded Documents Card
             html += '<div class="card mb-6"><div class="card-header"><h3>Uploaded Documents</h3></div><div class="detail-grid">';
-            if (shop.ownerPhotoPath) html += '<div class="detail-group"><div class="detail-label">Owner Photo</div><img src="/uploads/' + shop.ownerPhotoPath + '" style="max-width:200px;border-radius:8px;"></div>';
-            if (shop.aadhaarFrontPath) html += '<div class="detail-group"><div class="detail-label">Aadhaar Front</div><img src="/uploads/' + shop.aadhaarFrontPath + '" style="max-width:300px;border-radius:8px;"></div>';
-            if (shop.aadhaarBackPath) html += '<div class="detail-group"><div class="detail-label">Aadhaar Back</div><img src="/uploads/' + shop.aadhaarBackPath + '" style="max-width:300px;border-radius:8px;"></div>';
-            if (shop.panPath) html += '<div class="detail-group"><div class="detail-label">PAN Card</div><img src="/uploads/' + shop.panPath + '" style="max-width:300px;border-radius:8px;"></div>';
-            if (shop.shopLicensePath) html += '<div class="detail-group"><div class="detail-label">Shop License</div><img src="/uploads/' + shop.shopLicensePath + '" style="max-width:300px;border-radius:8px;"></div>';
+            
+            function renderDoc(label, path) {
+                if (!path) return '';
+                var isPdf = path.toLowerCase().endsWith('.pdf');
+                var content = isPdf 
+                    ? '<a href="' + path + '" target="_blank" class="btn btn-outline" style="display:inline-block;margin-top:8px;">📄 View PDF</a>'
+                    : '<img src="' + path + '" style="max-width:300px;border-radius:8px;margin-top:8px;">';
+                return '<div class="detail-group"><div class="detail-label">' + label + '</div>' + content + '</div>';
+            }
+            
+            html += renderDoc('Owner Photo', shop.ownerPhotoPath);
+            html += renderDoc('Aadhaar Front', shop.aadhaarFrontPath);
+            html += renderDoc('Aadhaar Back', shop.aadhaarBackPath);
+            html += renderDoc('PAN Card', shop.panPath);
+            html += renderDoc('Shop License', shop.shopLicensePath);
             html += '</div></div>';
 
             // Subscription Info

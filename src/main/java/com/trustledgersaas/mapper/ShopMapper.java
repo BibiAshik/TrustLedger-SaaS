@@ -23,11 +23,11 @@ public class ShopMapper {
                 .id(shop.getId())
                 .shopName(shop.getShopName())
                 .ownerFullName(shop.getOwnerFullName())
-                .ownerPhotoPath(shop.getOwnerPhotoPath())
-                .aadhaarFrontPath(shop.getAadhaarFrontPath())
-                .aadhaarBackPath(shop.getAadhaarBackPath())
-                .panPath(shop.getPanPath())
-                .shopLicensePath(shop.getShopLicensePath())
+                .ownerPhotoPath(formatUrl(shop.getOwnerPhotoPath()))
+                .aadhaarFrontPath(formatUrl(shop.getAadhaarFrontPath()))
+                .aadhaarBackPath(formatUrl(shop.getAadhaarBackPath()))
+                .panPath(formatUrl(shop.getPanPath()))
+                .shopLicensePath(formatUrl(shop.getShopLicensePath()))
                 .panNumber(shop.getPanNumber())
                 .businessType(shop.getBusinessType())
                 .phone(shop.getPhone())
@@ -68,5 +68,13 @@ public class ShopMapper {
         dto.setActiveLoanCount(activeLoanCount);
         dto.setOverdueLoanCount(overdueLoanCount);
         return dto;
+    }
+
+    /**
+     * Prefixes the relative file path with /uploads/ to make it a browser-usable URL.
+     */
+    private static String formatUrl(String path) {
+        if (path == null || path.isEmpty()) return null;
+        return path.startsWith("/uploads/") ? path : "/uploads/" + path;
     }
 }

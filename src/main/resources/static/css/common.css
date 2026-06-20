@@ -875,27 +875,27 @@ p {
 }
 
 .alert-success {
-    background: var(--success-bg);
-    color: #155724;
-    border: 1px solid #C3E6CB;
+    background: #2ecc71;
+    color: #050506;
+    border: 1px solid #2ecc71;
 }
 
 .alert-danger {
-    background: var(--danger-bg);
-    color: #721C24;
-    border: 1px solid #F5C6CB;
+    background: #e74c3c;
+    color: #ffffff;
+    border: 1px solid #e74c3c;
 }
 
 .alert-warning {
-    background: var(--warning-bg);
-    color: #856404;
-    border: 1px solid #FFEAA7;
+    background: #f39c12;
+    color: #050506;
+    border: 1px solid #f39c12;
 }
 
 .alert-info {
-    background: var(--info-bg);
-    color: #0C5460;
-    border: 1px solid #BEE5EB;
+    background: #3498db;
+    color: #ffffff;
+    border: 1px solid #3498db;
 }
 
 /* Toast notification (top-right floating) */

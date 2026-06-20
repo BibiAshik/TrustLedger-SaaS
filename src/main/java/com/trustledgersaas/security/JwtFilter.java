@@ -57,29 +57,43 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = extractTokenFromRequest(request);
 
         // Step 2: If a token exists and is valid, set up authentication
-        if (token != null && jwtUtil.validateToken(token)) {
+        try {
+            if (token != null && jwtUtil.validateToken(token)) {
 
-            // Step 3: Extract the user's email and role from the token
-            String email = jwtUtil.extractEmail(token);
-            String role = jwtUtil.extractRole(token);
+                // Step 3: Extract the user's email and role from the token
+                String email = jwtUtil.extractEmail(token);
+                String role = jwtUtil.extractRole(token);
 
-            // Step 4: Create a Spring Security authentication object
-            // This tells Spring Security "this user is authenticated with this role"
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            email,                                           // principal (who they are)
-                            null,                                            // credentials (not needed, token already verified)
-                            Collections.singletonList(new SimpleGrantedAuthority(role))  // authorities (what role they have)
-                    );
+                // Step 4: Create a Spring Security authentication object
+                // This tells Spring Security "this user is authenticated with this role"
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                email,                                           // principal (who they are)
+                                null,                                            // credentials (not needed, token already verified)
+                                Collections.singletonList(new SimpleGrantedAuthority(role))  // authorities (what role they have)
+                        );
 
-            // Attach request details (IP address, session ID, etc.) for audit logging
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // Attach request details (IP address, session ID, etc.) for audit logging
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // Step 5: Set this authentication in the SecurityContextHolder
-            // After this line, Spring Security considers this user "logged in" for this request
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Step 5: Set this authentication in the SecurityContextHolder
+                // After this line, Spring Security considers this user "logged in" for this request
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            log.debug("Authenticated user: {} with role: {}", email, role);
+                log.debug("Authenticated user: {} with role: {}", email, role);
+            }
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized\", \"expired\": true}");
+            return;
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized\", \"expired\": false}");
+            return;
         }
 
         // Step 6: Pass the request to the next filter in the chain

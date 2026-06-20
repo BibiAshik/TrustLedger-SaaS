@@ -143,6 +143,7 @@ public class JwtUtil {
             return true;
         } catch (ExpiredJwtException e) {
             log.warn("JWT token has expired: {}", e.getMessage());
+            throw e;
         } catch (MalformedJwtException e) {
             log.warn("Invalid JWT token format: {}", e.getMessage());
         } catch (SecurityException e) {

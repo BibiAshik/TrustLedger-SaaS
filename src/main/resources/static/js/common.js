@@ -17,27 +17,27 @@
  * Stores the JWT token and user info in localStorage after login.
  */
 function saveAuth(token, role, userId, shopId, fullName, email, phone) {
-    localStorage.setItem('jwt_token', token);
-    localStorage.setItem('user_role', role);
-    localStorage.setItem('user_id', userId);
-    if (shopId) localStorage.setItem('shop_id', shopId);
-    if (fullName) localStorage.setItem('user_full_name', fullName);
-    if (email) localStorage.setItem('user_email', email);
-    if (phone) localStorage.setItem('user_phone', phone);
+    sessionStorage.setItem('jwt_token', token);
+    sessionStorage.setItem('user_role', role);
+    sessionStorage.setItem('user_id', userId);
+    if (shopId) sessionStorage.setItem('shop_id', shopId);
+    if (fullName) sessionStorage.setItem('user_full_name', fullName);
+    if (email) sessionStorage.setItem('user_email', email);
+    if (phone) sessionStorage.setItem('user_phone', phone);
 }
 
 /**
  * Retrieves the stored JWT token.
  */
 function getToken() {
-    return localStorage.getItem('jwt_token');
+    return sessionStorage.getItem('jwt_token');
 }
 
 /**
  * Retrieves the stored user role.
  */
 function getRole() {
-    return localStorage.getItem('user_role');
+    return sessionStorage.getItem('user_role');
 }
 
 /**
@@ -54,13 +54,13 @@ function logout() {
 }
 
 function clearAuth() {
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('shop_id');
-    localStorage.removeItem('user_full_name');
-    localStorage.removeItem('user_email');
-    localStorage.removeItem('user_phone');
+    sessionStorage.removeItem('jwt_token');
+    sessionStorage.removeItem('user_role');
+    sessionStorage.removeItem('user_id');
+    sessionStorage.removeItem('shop_id');
+    sessionStorage.removeItem('user_full_name');
+    sessionStorage.removeItem('user_email');
+    sessionStorage.removeItem('user_phone');
 }
 
 function redirectToLoginForCurrentPage() {
@@ -125,7 +125,7 @@ function requireRoleForCurrentPage() {
  * Usage: const data = await apiCall('/api/shop/dashboard', 'GET');
  *        const result = await apiCall('/api/shop/loans', 'POST', loanData);
  */
-async function apiCall(url, method, body) {
+async function apiCall(url, method, body, _isRetry = false) {
     const token = getToken();
     const headers = {
         'Authorization': 'Bearer ' + token
@@ -153,6 +153,20 @@ async function apiCall(url, method, body) {
 
     // Handle 401 Unauthorized — token expired or invalid
     if (response.status === 401) {
+        try {
+            const errData = await response.json();
+            if (errData.expired === true) {
+                logout();
+                return null;
+            }
+        } catch (e) {
+            // Ignore json parse errors
+        }
+        
+        if (!_isRetry) {
+            return await apiCall(url, method, body, true);
+        }
+        
         logout();
         return null;
     }
