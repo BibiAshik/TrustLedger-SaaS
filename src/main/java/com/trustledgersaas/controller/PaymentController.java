@@ -94,6 +94,16 @@ public class PaymentController {
         Long shopId = extractShopId(authHeader);
         String planType = body.get("planType");
 
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
+
+        // Check downgrade logic
+        if ("BASIC".equalsIgnoreCase(planType) && "PRO".equalsIgnoreCase(shop.getPlan())) {
+            if ("ACTIVE".equalsIgnoreCase(shop.getSubscriptionStatus())) {
+                throw new InvalidRequestException("You are a PRO user. Please wait until your current subscription usage is finished to switch to BASIC.");
+            }
+        }
+
         // Determine the amount based on the plan
         BigDecimal amount;
         if ("PRO".equalsIgnoreCase(planType)) {

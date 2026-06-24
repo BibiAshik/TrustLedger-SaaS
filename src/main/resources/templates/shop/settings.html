@@ -80,8 +80,14 @@
                 html += '<p>Expires: ' + formatDate(shop.subscriptionExpiryDate) + '</p>';
             }
             html += '</div>';
-            html += '<div><button class="btn btn-gold" onclick="paySubscription(\'BASIC\')">Renew Basic (₹299)</button> ';
-            html += '<button class="btn btn-gold" onclick="paySubscription(\'PRO\')">Upgrade to Pro (₹699)</button></div>';
+            html += '<div>';
+            if (shop.plan === 'PRO') {
+                html += '<button class="btn btn-gold" onclick="paySubscription(\'PRO\')">Renew Pro (₹699)</button> ';
+                html += '<button class="btn btn-outline" style="border: 1px solid #D4A017; color: #D4A017; margin-left: 10px;" onclick="paySubscription(\'BASIC\')">Switch to Basic (₹299)</button>';
+            } else {
+                html += '<button class="btn btn-gold" onclick="paySubscription(\'BASIC\')">Renew Basic (₹299)</button> ';
+                html += '<button class="btn btn-gold" style="margin-left: 10px;" onclick="paySubscription(\'PRO\')">Upgrade to Pro (₹699)</button>';
+            }
             html += '</div></div>';
 
             // Plan comparison
