@@ -148,6 +148,16 @@ public class PageController {
         return "shop/dashboard";
     }
 
+    @GetMapping("/shop/recent-payments")
+    public String shopRecentPaymentsPage() {
+        return "shop/recent-payments";
+    }
+
+    @GetMapping("/shop/loans-due")
+    public String shopLoansDuePage() {
+        return "shop/loans-due";
+    }
+
     /**
      * Customers list page with live search.
      * URL: GET /shop/customers

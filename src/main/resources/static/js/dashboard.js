@@ -54,52 +54,50 @@ function renderShopDashboard(data) {
     // Render recent payments (Main Dashboard: max 3)
     const paymentsEl = document.getElementById('recentPayments');
     const allPaymentsEl = document.getElementById('allRecentPaymentsList');
-    if (paymentsEl) {
-        if (recentPayments.length === 0) {
-            paymentsEl.innerHTML = '<p class="text-muted text-center p-4">No recent payments</p>';
-            if(allPaymentsEl) allPaymentsEl.innerHTML = '<p class="text-muted text-center p-4">No recent payments</p>';
-        } else {
-            let dashboardHtml = '';
-            let modalHtml = '';
-            recentPayments.forEach(function(p, index) {
-                const itemHtml = '<div class="list-item">' +
-                    '<div class="item-info"><div class="item-avatar">' + getInitials(p.customerName) + '</div>' +
-                    '<div><div class="item-name">' + p.customerName + '</div>' +
-                    '<div class="item-sub">' + p.loanDisplayId + ' · ' + p.paymentMode + '</div></div></div>' +
-                    '<div class="item-right"><div class="item-amount">' + formatCurrency(p.amount) + '</div>' +
-                    '<div class="item-date">' + formatDate(p.paymentDate) + '</div></div></div>';
-                
-                if (index < 3) dashboardHtml += itemHtml;
-                modalHtml += itemHtml;
-            });
-            paymentsEl.innerHTML = dashboardHtml;
-            if(allPaymentsEl) allPaymentsEl.innerHTML = modalHtml;
-        }
+    
+    if (recentPayments.length === 0) {
+        if(paymentsEl) paymentsEl.innerHTML = '<p class="text-muted text-center p-4">No recent payments</p>';
+        if(allPaymentsEl) allPaymentsEl.innerHTML = '<p class="text-muted text-center p-4">No recent payments</p>';
+    } else {
+        let dashboardHtml = '';
+        let modalHtml = '';
+        recentPayments.forEach(function(p, index) {
+            const itemHtml = '<div class="list-item">' +
+                '<div class="item-info"><div class="item-avatar">' + getInitials(p.customerName) + '</div>' +
+                '<div><div class="item-name">' + p.customerName + '</div>' +
+                '<div class="item-sub">' + p.loanDisplayId + ' · ' + p.paymentMode + '</div></div></div>' +
+                '<div class="item-right"><div class="item-amount">' + formatCurrency(p.amount) + '</div>' +
+                '<div class="item-date">' + formatDate(p.paymentDate) + '</div></div></div>';
+            
+            if (index < 3) dashboardHtml += itemHtml;
+            modalHtml += itemHtml;
+        });
+        if(paymentsEl) paymentsEl.innerHTML = dashboardHtml;
+        if(allPaymentsEl) allPaymentsEl.innerHTML = modalHtml;
     }
 
     // Render loans due this week (Main Dashboard: max 3)
     const dueEl = document.getElementById('loansDueThisWeek');
     const allDueEl = document.getElementById('allLoansDueList');
-    if (dueEl) {
-        if (loansDueThisWeek.length === 0) {
-            dueEl.innerHTML = '<p class="text-muted text-center p-4">No loans due this week</p>';
-            if(allDueEl) allDueEl.innerHTML = '<p class="text-muted text-center p-4">No loans due this week</p>';
-        } else {
-            let dashboardHtml = '';
-            let modalHtml = '';
-            loansDueThisWeek.forEach(function(loan, index) {
-                const itemHtml = '<div class="list-item" onclick="window.location.href=\'/shop/loans/' + loan.id + '\'" style="cursor:pointer;">' +
-                    '<div class="item-info"><div><div class="item-name">' + loan.loanId + '</div>' +
-                    '<div class="item-sub">' + loan.customerName + ' · ' + loan.goldItemType + '</div></div></div>' +
-                    '<div class="item-right"><div class="item-amount">' + formatCurrency(loan.balanceDue) + '</div>' +
-                    '<div class="item-date">Due: ' + formatDate(loan.dueDate) + '</div></div></div>';
-                
-                if (index < 3) dashboardHtml += itemHtml;
-                modalHtml += itemHtml;
-            });
-            dueEl.innerHTML = dashboardHtml;
-            if(allDueEl) allDueEl.innerHTML = modalHtml;
-        }
+    
+    if (loansDueThisWeek.length === 0) {
+        if(dueEl) dueEl.innerHTML = '<p class="text-muted text-center p-4">No loans due this week</p>';
+        if(allDueEl) allDueEl.innerHTML = '<p class="text-muted text-center p-4">No loans due this week</p>';
+    } else {
+        let dashboardHtml = '';
+        let modalHtml = '';
+        loansDueThisWeek.forEach(function(loan, index) {
+            const itemHtml = '<div class="list-item" onclick="window.location.href=\'/shop/loans/' + loan.id + '\'" style="cursor:pointer;">' +
+                '<div class="item-info"><div><div class="item-name">' + loan.loanId + '</div>' +
+                '<div class="item-sub">' + loan.customerName + ' · ' + loan.goldItemType + '</div></div></div>' +
+                '<div class="item-right"><div class="item-amount">' + formatCurrency(loan.balanceDue) + '</div>' +
+                '<div class="item-date">Due: ' + formatDate(loan.dueDate) + '</div></div></div>';
+            
+            if (index < 3) dashboardHtml += itemHtml;
+            modalHtml += itemHtml;
+        });
+        if(dueEl) dueEl.innerHTML = dashboardHtml;
+        if(allDueEl) allDueEl.innerHTML = modalHtml;
     }
 }
 
