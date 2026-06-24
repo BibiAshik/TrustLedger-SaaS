@@ -2,31 +2,43 @@
 
 > *"Protect Gold. Preserve Trust."*
 
-Trust Ledger is a multi-tenant SaaS platform that digitizes gold loan management for local gold loan shops in India. It provides shop owners with a complete digital dashboard, automated customer reminders, online payment collection, and a customer self-service portal.
+Trust Ledger is a comprehensive, production-ready SaaS application designed to digitize the operations of local gold loan and finance businesses in India. 
+
+It provides shop owners with a powerful digital dashboard to manage customers and loans, while offering their end-customers a seamless self-service portal to view balances and make online interest payments. The platform is multi-tenant, meaning a single instance can securely host data for hundreds of independent shop owners.
 
 ---
 
-## ✨ Features
+## 📸 Screenshots
 
-### 🏪 Shop Owner Portal
-- **Digital Loan Records** — Replace handwritten registers with structured digital records
-- **Customer Management** — Add customers with KYC (Aadhaar, PAN, photos)
-- **Loan Lifecycle** — Create, track, close, extend, and seize gold loans
-- **Cash Payment Recording** — Record in-person payments with receipts
-- **Dashboard Analytics** — Active loans, overdue loans, total volume, recent payments
-- **Automated Reminders** — Email/SMS alerts at Day 1, 7, 15, and 30 overdue
+*(Add your screenshots here)*
 
-### 👤 Customer Portal (PRO Plan)
-- **View Loans** — Customers can see all their active/past loans
-- **Online Payments** — Pay interest via Razorpay (UPI, Cards, Net Banking)
-- **Payment History** — View all past payments with PDF receipt downloads
-- **Gold Seizure Warning** — Visual warning banner for 30+ day overdue loans
+- **Landing Page:** 
+- **Shop Owner Dashboard:** 
+- **Customer Payment Portal:** 
+- **Super Admin Panel:** 
 
-### 👑 Super Admin Panel
-- **Platform Analytics** — Total shops, customers, loans, revenue
-- **Shop Approval/Rejection** — Review and approve new shop registrations
-- **Subscription Revenue Log** — Track all subscription payments
-- **Shop Suspension** — Suspend shops that violate terms
+---
+
+## ✨ Key Features
+
+### 🏪 Shop Owner Portal (The Core App)
+- **Digital Loan Records:** Replace handwritten ledgers with structured digital records.
+- **Customer Management:** Onboard customers with KYC details (Aadhaar, PAN, photos).
+- **Loan Lifecycle:** Create, track, close, and seize gold loans securely.
+- **Payment Processing:** Record manual cash payments and automatically sync online Razorpay payments.
+- **Smart Analytics Dashboard:** Monitor active loans, overdue loans, total loan volume, and recent payments at a glance.
+- **Automated Reminders:** Scheduled background jobs automatically send email reminders to customers when their loans become 1, 7, 15, or 30 days overdue.
+
+### 👤 Customer Portal (Available on PRO Plan)
+- **Self-Service Dashboard:** Customers can log in to view their active and past loans.
+- **Online Payments:** Securely pay accrued loan interest online via Razorpay (UPI, Cards, Net Banking). Payments are routed directly to the specific Shop Owner's bank account.
+- **Payment History:** View all past transactions and download generated PDF receipts.
+- **Status Alerts:** Visual warning banners for loans that are 30+ days overdue to prevent gold seizure.
+
+### 👑 Super Admin Panel (Platform Management)
+- **Platform Analytics:** Track total registered shops, active customers, total loans, and total platform revenue.
+- **Shop Approvals:** Review new shop registrations and approve/reject them.
+- **Subscription Management:** View all incoming subscription payments from Shop Owners (Basic / PRO plans).
 
 ---
 
@@ -34,23 +46,31 @@ Trust Ledger is a multi-tenant SaaS platform that digitizes gold loan management
 
 | Layer | Technology |
 |-------|-----------|
-| **Backend** | Java 17, Spring Boot 3.2.5 |
-| **Security** | Spring Security + JWT (Stateless) |
-| **Database** | MySQL 8 with JPA/Hibernate |
-| **Payments** | Razorpay (Checkout + Route for PRO) |
-| **PDF** | iText 7 (Payment receipts) |
-| **Email** | Spring Mail (SMTP) |
-| **Frontend** | HTML5 + CSS3 + Vanilla JavaScript |
-| **Deployment** | Docker + Docker Compose |
+| **Backend** | Java 17, Spring Boot 3.2.5 (Spring MVC, Spring Data JPA) |
+| **Security** | Spring Security + JWT (Stateless Authentication) |
+| **Database** | MySQL 8 with Hibernate (JPA) |
+| **Payments** | Razorpay (Checkout + Razorpay Route for Multi-vendor splits) |
+| **Scheduled Jobs** | Spring `@Scheduled` (Daily cron jobs for status updates & emails) |
+| **Email** | Spring Mail (SMTP integration) |
+| **Frontend** | HTML5, Vanilla CSS (Custom Design System), Vanilla JS (Fetch API) |
+| **Deployment** | Docker, Docker Compose, Railway |
 
 ---
 
-## 🚀 Quick Start
+## 🏗️ Architecture Highlights
+
+- **Data Isolation:** Every entity (Customer, Loan, Payment) is strictly bound to a `Shop ID`. Queries use role-based access control and JWT claims to ensure Shop A can never see Shop B's data.
+- **Smart Razorpay Routing:** Trust Ledger uses Razorpay Route. When a customer pays loan interest online, the money bypasses the Super Admin and routes directly to the specific Shop Owner's linked Razorpay account.
+- **Stateless Authentication:** Fully stateless JWT architecture. No server-side sessions, allowing the app to scale horizontally with ease.
+
+---
+
+## 🚀 Local Development Setup
 
 ### Prerequisites
 - Java 17+
 - MySQL 8.0+
-- Maven 3.8+ (or use the included `mvnw` wrapper)
+- Maven (or use the included `./mvnw` wrapper)
 
 ### 1. Clone the repository
 ```bash
@@ -58,138 +78,65 @@ git clone https://github.com/your-username/TrustLedger-SaaS.git
 cd TrustLedger-SaaS
 ```
 
-### 2. Configure the database
-Create a MySQL database:
+### 2. Configure the Database
+Create a new MySQL database:
 ```sql
-CREATE DATABASE trustledger_db;
+CREATE DATABASE trustledger_saas;
 ```
 
-### 3. Update application.properties
-Edit `src/main/resources/application.properties`:
+### 3. Setup Local Properties (Important!)
+To keep your secrets safe, the main `application.properties` uses placeholder keys. For local development, create an `application-local.properties` file in `src/main/resources/` (this file is ignored by Git):
+
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/trustledger_db
+# src/main/resources/application-local.properties
+
+# Database Credentials
 spring.datasource.username=root
-spring.datasource.password=your_password
+spring.datasource.password=YOUR_REAL_MYSQL_PASSWORD
 
-jwt.secret=your-very-long-secret-key-at-least-64-characters
+# Email SMTP Setup (App Password)
+spring.mail.password=YOUR_GMAIL_APP_PASSWORD
 
-razorpay.key.id=rzp_test_xxxxxxxxxxxx
-razorpay.key.secret=xxxxxxxxxxxxxxxxxxxxxxxxxx
+# Razorpay Test Keys
+RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxx
+razorpay.key.id=${RAZORPAY_KEY_ID}
+razorpay.key.secret=${RAZORPAY_KEY_SECRET}
 ```
 
-### 4. Run the application
+### 4. Run the Application
+Run the app using the `local` profile to automatically load your secrets:
 ```bash
-./mvnw spring-boot:run
-```
-Or if Maven is in your PATH:
-```bash
-mvn spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-### 5. Access the application
-- **Homepage:** http://localhost:8080/
-- **Admin Login:** http://localhost:8080/admin/login
-- **Default Admin:** `admin@trustledger.com` / `Admin@123`
+### 5. Access the Application
+- **Main Website / Shop Owner Login:** `http://localhost:8080/`
+- **Customer Login:** `http://localhost:8080/customer/login`
+- **Super Admin Login:** `http://localhost:8080/admin/login`
+
+*(Default Super Admin credentials are created on startup: `admin@trustledger.com` / `Admin@123`)*
 
 ---
 
 ## 🐳 Docker Deployment
 
+The project includes a `docker-compose.yml` file for easy deployment.
+
 ```bash
-# Build and start everything
+# Build and start the MySQL and Spring Boot containers in the background
 docker-compose up -d --build
 
 # View logs
-docker-compose logs -f app
-
-# Stop
-docker-compose down
+docker-compose logs -f
 ```
 
----
-
-## 📂 Project Structure
-
-```
-TrustLedger-SaaS/
-├── src/main/java/com/trustledgersaas/
-│   ├── TrustLedgerSaasApplication.java    # Main entry point
-│   ├── config/
-│   │   ├── SecurityConfig.java            # Spring Security + JWT config
-│   │   └── DataInitializer.java           # Seeds Super Admin on first run
-│   ├── controller/
-│   │   ├── PageController.java            # Serves HTML templates
-│   │   ├── AuthController.java            # Login/Register APIs
-│   │   ├── ShopController.java            # Shop owner APIs
-│   │   ├── SuperAdminController.java      # Admin APIs
-│   │   ├── CustomerController.java        # Customer portal APIs
-│   │   ├── LoanController.java            # Loan CRUD APIs
-│   │   └── PaymentController.java         # Payment APIs
-│   ├── entity/                            # JPA entities
-│   ├── repository/                        # Spring Data JPA repos
-│   ├── service/                           # Business logic
-│   ├── dto/                               # Request/Response DTOs
-│   ├── mapper/                            # Entity ↔ DTO mappers
-│   ├── security/                          # JWT filter, util, user details
-│   ├── exception/                         # Custom exceptions + handler
-│   └── util/                              # Interest calculator
-├── src/main/resources/
-│   ├── application.properties
-│   ├── templates/                         # HTML templates
-│   │   ├── index.html                     # Public homepage
-│   │   ├── auth/                          # Registration, password, status pages
-│   │   ├── admin/                         # Super Admin pages
-│   │   ├── shop/                          # Shop Owner pages
-│   │   └── customer/                      # Customer portal pages
-│   └── static/                            # CSS, JS, images
-│       ├── css/
-│       ├── js/
-│       └── images/                        # Logo, favicon, and UI images
-├── Dockerfile
-├── docker-compose.yml
-└── pom.xml
-```
-
----
-
-## 💰 Subscription Plans
-
-| Feature | Basic (₹299/mo) | Pro (₹699/mo) |
-|---------|:---:|:---:|
-| Dashboard & Loan Management | ✅ | ✅ |
-| Customer Limit | 100 | Unlimited |
-| Cash Payment Recording | ✅ | ✅ |
-| Email/SMS Reminders | ✅ | ✅ |
-| Customer Login Portal | ❌ | ✅ |
-| Online Payment Collection | ❌ | ✅ |
-| PDF Receipt Downloads | ❌ | ✅ |
-
----
-
-## 🔐 Roles & Access
-
-| Role | Access |
-|------|--------|
-| **Super Admin** | `/admin/**` — Platform management, shop approvals, revenue |
-| **Shop Owner** | `/shop/**` — Dashboard, customers, loans, settings |
-| **Customer** | `/customer/**` — View loans, make payments, profile |
-
----
-
-## 🎨 Design System
-
-- **Background:** Cream (#FAF3E0)
-- **Accent:** Gold (#D4A017)
-- **Text:** Dark Navy (#1A1A2E)
-- **Font:** Inter (Google Fonts)
-- **Mobile:** Responsive with bottom navigation
-
----
-
-## 📝 License
-
-This project is proprietary. All rights reserved.
-
----
-
-*Built with ❤️ for the gold loan shops of India.*
+## ☁️ Production Deployment (Railway)
+1. Link your GitHub repository to Railway.
+2. Add a **MySQL** database plugin to your Railway project.
+3. In your Spring Boot service variables, override the placeholders:
+   - `SPRING_PROFILES_ACTIVE=prod`
+   - `MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+   - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+   - `MAIL_PASSWORD`
+4. Railway will automatically build the `Dockerfile` and deploy the application.
