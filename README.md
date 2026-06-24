@@ -13,9 +13,25 @@ It provides shop owners with a powerful digital dashboard to manage customers an
 *(Add your screenshots here)*
 
 - **Landing Page:** 
+<img width="1600" height="897" alt="image" src="https://github.com/user-attachments/assets/dd0b550f-670a-4691-9731-b0b94e2114ec" />
+<img width="1600" height="898" alt="image" src="https://github.com/user-attachments/assets/5bffd727-323d-44ae-b881-64110833950f" />
+<img width="1600" height="898" alt="image" src="https://github.com/user-attachments/assets/2bbb9276-4e6e-43c6-a577-500df28b58ec" />
+
 - **Shop Owner Dashboard:** 
-- **Customer Payment Portal:** 
+<img width="1600" height="895" alt="image" src="https://github.com/user-attachments/assets/a59c9b16-ae92-4a19-a897-d0a829f0dc93" />
+<img width="1600" height="896" alt="image" src="https://github.com/user-attachments/assets/03bf0a84-c519-4bdd-b381-fd85b24c61bf" />
+<img width="1600" height="898" alt="image" src="https://github.com/user-attachments/assets/40d74965-08df-4635-bb69-b3cd3322fca4" />
+
+
+
+- **Customer Payment Portal:**
+<img width="1600" height="898" alt="image" src="https://github.com/user-attachments/assets/3ebbaa37-451d-4557-8b2e-6826c043e67f" />
+<img width="1600" height="898" alt="image" src="https://github.com/user-attachments/assets/5e34b5ac-4758-4e6a-abe1-49686a761de3" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/abcfbae8-515c-4b07-9210-6027ec9619a3" />
+<img width="720" height="1600" alt="image" src="https://github.com/user-attachments/assets/7cb40bb4-8672-4042-8606-f68ffe06cf6d" />
+
 - **Super Admin Panel:** 
+<img width="1600" height="899" alt="image" src="https://github.com/user-attachments/assets/dfddb96e-c05e-4391-abf4-710c1f44869a" />
 
 ---
 
