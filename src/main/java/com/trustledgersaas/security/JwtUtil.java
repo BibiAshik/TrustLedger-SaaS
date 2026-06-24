@@ -71,12 +71,12 @@ public class JwtUtil {
 
         // Build the JWT with claims (pieces of information embedded in the token)
         JwtBuilder builder = Jwts.builder()
-                .subject(email)                      // "sub" claim: who is this token for?
+                .setSubject(email)                    // "sub" claim: who is this token for?
                 .claim("role", role)                  // Custom claim: what role does this user have?
                 .claim("userId", userId)              // Custom claim: database user ID
-                .issuedAt(now)                        // "iat" claim: when was this token created?
-                .expiration(expiryDate)               // "exp" claim: when does this token expire?
-                .signWith(getSigningKey());           // Sign with our secret key
+                .setIssuedAt(now)                      // "iat" claim: when was this token created?
+                .setExpiration(expiryDate)             // "exp" claim: when does this token expire?
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256); // Sign with our secret key
 
         // Only add shopId claim if it's not null (Super Admin doesn't have a shop)
         if (shopId != null) {
@@ -141,15 +141,20 @@ public class JwtUtil {
         try {
             parseClaims(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            log.warn("JWT token has expired: {}", e.getMessage());
-            throw e;
-        } catch (MalformedJwtException e) {
-            log.warn("Invalid JWT token format: {}", e.getMessage());
-        } catch (SecurityException e) {
-            log.warn("JWT signature validation failed: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.warn("JWT token is empty or null: {}", e.getMessage());
+        } catch (Exception e) {
+            String exName = e.getClass().getName();
+            if (exName.contains("ExpiredJwtException")) {
+                log.warn("JWT token has expired: {}", e.getMessage());
+                throw (RuntimeException) e;
+            } else if (exName.contains("MalformedJwtException")) {
+                log.warn("Invalid JWT token format: {}", e.getMessage());
+            } else if (exName.contains("SecurityException") || exName.contains("SignatureException")) {
+                log.warn("JWT signature validation failed: {}", e.getMessage());
+            } else if (exName.contains("IllegalArgumentException")) {
+                log.warn("JWT token is empty or null: {}", e.getMessage());
+            } else {
+                log.warn("JWT token invalid: {}", e.getMessage());
+            }
         }
         return false;
     }
@@ -164,10 +169,10 @@ public class JwtUtil {
      * Throws: Various JwtExceptions if the token is invalid.
      */
     private Claims parseClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

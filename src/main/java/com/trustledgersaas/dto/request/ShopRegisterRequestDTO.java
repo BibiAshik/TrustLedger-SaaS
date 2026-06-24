@@ -90,4 +90,11 @@ public class ShopRegisterRequestDTO {
      */
     @NotBlank(message = "Business type is required")
     private String businessType;
+
+    /**
+     * Intended subscription plan (BASIC or PRO).
+     * Captured during registration.
+     */
+    @NotBlank(message = "Subscription plan selection is required")
+    private String intendedPlan;
 }

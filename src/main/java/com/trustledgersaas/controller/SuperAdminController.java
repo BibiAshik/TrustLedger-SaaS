@@ -132,6 +132,22 @@ public class SuperAdminController {
         return ResponseEntity.ok(shopService.suspendShop(id));
     }
 
+    /** Reactivates a suspended shop */
+    @PostMapping("/api/admin/shops/{id}/reactivate")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> reactivateShop(@PathVariable Long id) {
+        return ResponseEntity.ok(shopService.reactivateShop(id));
+    }
+
+    /** Deletes a suspended shop */
+    @DeleteMapping("/api/admin/shops/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteShop(@PathVariable Long id) {
+        return ResponseEntity.ok(shopService.deleteShop(id));
+    }
+
     /** Extends a shop's subscription */
     @PostMapping("/api/admin/subscriptions/{shopId}/extend")
     @PreAuthorize("hasRole('SUPER_ADMIN')")

@@ -152,9 +152,19 @@
                 <!-- SECTION 1: Shop Information -->
                 <div class="form-section-title">Shop Information</div>
 
-                <div class="form-group">
-                    <label>Shop Name <span class="required">*</span></label>
-                    <input type="text" name="shopName" class="form-input" placeholder="e.g. Krishna Gold Loans" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Shop Name <span class="required">*</span></label>
+                        <input type="text" name="shopName" class="form-input" placeholder="e.g. Krishna Gold Loans" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Plan <span class="required">*</span></label>
+                        <select name="intendedPlan" id="intendedPlan" class="form-select" required>
+                            <option value="" disabled selected>Select a plan</option>
+                            <option value="BASIC">Basic (₹299/month)</option>
+                            <option value="PRO">Pro (₹699/month)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-row">
@@ -214,27 +224,14 @@
                 <!-- SECTION 3: KYC Documents -->
                 <div class="form-section-title">KYC Documents</div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Aadhaar Front <span class="required">*</span></label>
-                        <div class="file-upload">
-                            <div class="file-upload-area">
-                                <div class="upload-icon">🪪</div>
-                                <div class="upload-text">Aadhaar card front</div>
-                                <div class="file-name"></div>
-                                <input type="file" name="aadhaarFront" accept="image/*" onchange="handleFileSelect(this)" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Aadhaar Back <span class="required">*</span></label>
-                        <div class="file-upload">
-                            <div class="file-upload-area">
-                                <div class="upload-icon">🪪</div>
-                                <div class="upload-text">Aadhaar card back</div>
-                                <div class="file-name"></div>
-                                <input type="file" name="aadhaarBack" accept="image/*" onchange="handleFileSelect(this)" required>
-                            </div>
+                <div class="form-group">
+                    <label>Aadhaar Card <span class="required">*</span></label>
+                    <div class="file-upload">
+                        <div class="file-upload-area">
+                            <div class="upload-icon">🪪</div>
+                            <div class="upload-text">Aadhaar Document</div>
+                            <div class="file-name"></div>
+                            <input type="file" name="aadhaarDocument" accept="image/*,application/pdf" onchange="handleFileSelect(this)" required>
                         </div>
                     </div>
                 </div>
@@ -338,6 +335,29 @@
             else if (role === 'ROLE_SHOP_OWNER') window.location.href = '/shop/dashboard';
             else if (role === 'ROLE_CUSTOMER') window.location.href = '/customer/dashboard';
         }
+        // Parse URL parameters to auto-select and lock the plan
+        var urlParams = new URLSearchParams(window.location.search);
+        var planParam = urlParams.get('plan');
+        var planSelect = document.getElementById('intendedPlan');
+        
+        if (planParam === 'BASIC' || planParam === 'PRO') {
+            planSelect.value = planParam;
+            planSelect.style.pointerEvents = 'none';
+            planSelect.style.backgroundColor = 'rgba(255, 215, 0, 0.05)';
+            planSelect.style.color = 'var(--gold)';
+            planSelect.style.borderColor = 'var(--gold)';
+            planSelect.style.opacity = '1';
+            planSelect.title = "Plan selected from pricing page. Go back to change.";
+            
+            // Add a hidden input since disabled selects don't submit their value
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'intendedPlan';
+            hiddenInput.value = planParam;
+            document.getElementById('registerForm').appendChild(hiddenInput);
+            planSelect.name = ''; // Remove name so it doesn't conflict
+        }
+
     </script>
 </body>
 </html>

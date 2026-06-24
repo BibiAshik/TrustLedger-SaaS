@@ -11,6 +11,7 @@ import com.trustledgersaas.repository.CustomerRepository;
 import com.trustledgersaas.repository.ShopRepository;
 import com.trustledgersaas.repository.UserRepository;
 import com.trustledgersaas.security.JwtUtil;
+import com.trustledgersaas.util.FileUploadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,8 +92,7 @@ public class AuthService {
     @Transactional
     public Map<String, Object> registerShopOwner(ShopRegisterRequestDTO dto,
                                                   MultipartFile ownerPhoto,
-                                                  MultipartFile aadhaarFront,
-                                                  MultipartFile aadhaarBack,
+                                                  MultipartFile aadhaarDocument,
                                                   MultipartFile panDocument,
                                                   MultipartFile shopLicense) {
 
@@ -113,12 +113,11 @@ public class AuthService {
         user = userRepository.save(user);
 
         // Step 3: Save uploaded files and get their paths
-        String ownerPhotoPath = saveFile(ownerPhoto, "shops/" + user.getId() + "/owner");
-        String aadhaarFrontPath = saveFile(aadhaarFront, "shops/" + user.getId() + "/aadhaar");
-        String aadhaarBackPath = saveFile(aadhaarBack, "shops/" + user.getId() + "/aadhaar");
-        String panPath = saveFile(panDocument, "shops/" + user.getId() + "/pan");
+        String ownerPhotoPath = FileUploadUtil.saveFile(ownerPhoto, "shops/" + user.getId() + "/owner");
+        String aadhaarDocumentPath = FileUploadUtil.saveFile(aadhaarDocument, "shops/" + user.getId() + "/aadhaar");
+        String panPath = FileUploadUtil.saveFile(panDocument, "shops/" + user.getId() + "/pan");
         String shopLicensePath = shopLicense != null && !shopLicense.isEmpty()
-                ? saveFile(shopLicense, "shops/" + user.getId() + "/license") : null;
+                ? FileUploadUtil.saveFile(shopLicense, "shops/" + user.getId() + "/license") : null;
 
         // Step 4: Create the Shop record
         Shop shop = Shop.builder()
@@ -130,8 +129,7 @@ public class AuthService {
                 .address(dto.getAddress())
                 .city(dto.getCity())
                 .pincode(dto.getPincode())
-                .aadhaarFrontPath(aadhaarFrontPath)
-                .aadhaarBackPath(aadhaarBackPath)
+                .aadhaarDocumentPath(aadhaarDocumentPath)
                 .panPath(panPath)
                 .panNumber(dto.getPanNumber())
                 .businessType(dto.getBusinessType())
@@ -143,6 +141,7 @@ public class AuthService {
                 .shopLicensePath(shopLicensePath)
                 .status("PENDING")
                 .plan("BASIC")
+                .intendedPlan(dto.getIntendedPlan())
                 .subscriptionStatus("NONE")
                 .user(user)
                 .build();
@@ -227,11 +226,9 @@ public class AuthService {
                 throw new InvalidRequestException("This shop is currently inactive. Please contact support.");
             }
 
-            // Block login if subscription is EXPIRED
-            if ("EXPIRED".equals(shop.getSubscriptionStatus())) {
-                throw new InvalidRequestException("Your subscription has expired. " +
-                        "Please renew your subscription to continue using Trust Ledger.");
-            }
+            // We no longer block login for expired subscriptions here.
+            // A shop owner must be able to log in to access the Dashboard and Settings to renew.
+            // The SubscriptionInterceptor will block them from accessing other features if the grace period has passed.
 
             shopId = shop.getId();
             redirectUrl = "/shop/dashboard";
@@ -406,7 +403,9 @@ public class AuthService {
         }
 
         // Check subscription status
-        if ("EXPIRED".equals(shop.getSubscriptionStatus())) {
+        // Customers are blocked from logging in ONLY if the 24-hour grace period has fully expired.
+        if (shop.getSubscriptionExpiryDate() != null && 
+            java.time.LocalDate.now().isAfter(shop.getSubscriptionExpiryDate().plusDays(1))) {
             throw new InvalidRequestException("This shop's subscription has expired. " +
                     "Please contact " + shop.getShopName() + " directly regarding your loan.");
         }
@@ -580,44 +579,5 @@ public class AuthService {
         }
 
         userRepository.save(user);
-    }
-
-    // ==================== FILE UPLOAD HELPER ====================
-
-    /**
-     * Saves an uploaded file to the local filesystem.
-     *
-     * Purpose: Store uploaded documents (Aadhaar, PAN, photos) in an organized folder structure.
-     * Input: The uploaded MultipartFile and a subdirectory path (e.g. "shops/1/aadhaar").
-     * Output: The relative file path where the file was saved (for storing in the database).
-     */
-    public String saveFile(MultipartFile file, String subdirectory) {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-
-        try {
-            // Create the target directory if it doesn't exist
-            Path dirPath = Paths.get(uploadDir, subdirectory);
-            Files.createDirectories(dirPath);
-
-            // Generate a unique filename to prevent collisions
-            String originalFilename = file.getOriginalFilename();
-            String extension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-            String uniqueFilename = UUID.randomUUID().toString() + extension;
-
-            // Save the file
-            Path filePath = dirPath.resolve(uniqueFilename);
-            Files.write(filePath, file.getBytes());
-
-            // Return the relative path (stored in the database, used to serve the file later)
-            return subdirectory + "/" + uniqueFilename;
-        } catch (IOException e) {
-            log.error("Failed to save file: {}", e.getMessage());
-            throw new RuntimeException("Failed to upload file. Please try again.");
-        }
     }
 }

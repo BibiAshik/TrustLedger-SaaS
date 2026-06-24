@@ -82,6 +82,9 @@ public class Customer {
     /** File path to the uploaded Aadhaar front image */
     private String aadhaarFrontPath;
 
+    /** File path to the uploaded Passport Size Photo */
+    private String photoPath;
+
     /** PAN card number — MANDATORY for all customers */
     @Column(nullable = false)
     private String panNumber;

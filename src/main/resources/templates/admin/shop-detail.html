@@ -56,7 +56,10 @@
         </main>
     </div>
 
+
+
     <script src="/js/common.js"></script>
+    <script src="/js/admin.js"></script>
     <script src="/js/dashboard.js"></script>
     <script>
         if (!requireAuth()) { /* redirects */ }
@@ -82,16 +85,20 @@
             if (shop.status === 'PENDING') {
                 actionsHtml = '<button class="btn btn-success" onclick="approveShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">✅ Approve</button> ' +
                     '<button class="btn btn-danger" onclick="rejectShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">❌ Reject</button>';
-            } else if (shop.status !== 'SUSPENDED') {
-                actionsHtml = '<button class="btn btn-danger" onclick="suspendShop(' + shop.id + ')">🚫 Suspend Shop</button>';
+            } else if (shop.status === 'SUSPENDED') {
+                actionsHtml = '<button class="btn btn-success" onclick="reactivateShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">✅ Reactivate Shop</button> ' +
+                    '<button class="btn btn-danger" onclick="deleteShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">🗑️ Delete Shop</button>';
+            } else {
+                actionsHtml = '<button class="btn btn-danger" onclick="suspendShop(' + shop.id + ', \'' + shop.shopName.replace(/'/g, "\\'") + '\')">🚫 Suspend Shop</button>';
             }
             document.getElementById('shopActions').innerHTML = actionsHtml;
 
             var html = '';
 
             // Status & Plan info
+            var displayPlan = shop.intendedPlan || shop.plan || 'BASIC';
             html += '<div class="flex gap-3 mb-6">' + getStatusBadge(shop.status) +
-                ' <span class="badge badge-' + (shop.plan || 'basic').toLowerCase() + '">' + (shop.plan || 'BASIC') + ' Plan</span></div>';
+                ' <span class="badge badge-' + displayPlan.toLowerCase() + '">' + displayPlan + ' Plan</span></div>';
 
             // Shop Profile Card
             html += '<div class="card mb-6"><div class="card-header"><h3>Shop Profile</h3></div>';
@@ -134,8 +141,7 @@
             }
             
             html += renderDoc('Owner Photo', shop.ownerPhotoPath);
-            html += renderDoc('Aadhaar Front', shop.aadhaarFrontPath);
-            html += renderDoc('Aadhaar Back', shop.aadhaarBackPath);
+            html += renderDoc('Aadhaar Card', shop.aadhaarDocumentPath);
             html += renderDoc('PAN Card', shop.panPath);
             html += renderDoc('Shop License', shop.shopLicensePath);
             html += '</div></div>';

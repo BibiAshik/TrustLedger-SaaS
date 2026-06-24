@@ -41,7 +41,15 @@
                 <button class="btn btn-blue btn-sm" onclick="resetCustomerPassword()">🔑 Reset Password</button>
             </div>
             <div id="customerDetailContent">
-                <div class="loading-overlay"><div class="spinner spinner-lg"></div><p>Loading...</p></div>
+                <div class="loading-overlay"><div class="spinner spinner-lg"></div><p>Loading customer details...</p></div>
+            </div>
+
+            <!-- Image Modal -->
+            <div id="imageModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); align-items:center; justify-content:center;">
+                <div class="modal-content" style="padding: 20px; background: white; border-radius: 8px; position: relative; max-width: 90vw; max-height: 90vh; display:flex; flex-direction:column; align-items:center;">
+                    <span class="close" onclick="closeImageModal()" style="color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                    <img id="modalImage" src="" style="max-width: 100%; max-height: calc(90vh - 60px); border-radius: 4px; margin-top: 20px;">
+                </div>
             </div>
         </main>
     </div>
@@ -77,8 +85,9 @@
             html += '<div class="detail-group"><div class="detail-label">Date of Birth</div><div class="detail-value">' + formatDate(c.dateOfBirth) + '</div></div>';
             html += '<div class="detail-group"><div class="detail-label">Gender</div><div class="detail-value">' + (c.gender || '—') + '</div></div>';
             html += '<div class="detail-group"><div class="detail-label">Address</div><div class="detail-value">' + c.address + '</div></div>';
-            html += '<div class="detail-group"><div class="detail-label">Aadhaar</div><div class="detail-value">' + (c.maskedAadhaarNumber || 'XXXX XXXX XXXX') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Aadhaar</div><div class="detail-value" style="display:flex; align-items:center; gap:10px;">' + (c.aadhaarNumber || 'XXXX XXXX XXXX') + (c.aadhaarFrontPath ? '<button class="btn btn-sm btn-outline" onclick="showImageModal(\'' + c.aadhaarFrontPath + '\')">View</button>' : '') + '</div></div>';
             html += '<div class="detail-group"><div class="detail-label">PAN</div><div class="detail-value">' + (c.panNumber || '—') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Profile Photo</div><div class="detail-value">' + (c.photoPath ? '<button class="btn btn-sm btn-outline" onclick="showImageModal(\'' + c.photoPath + '\')">View Photo</button>' : 'Not Uploaded') + '</div></div>';
             html += '</div></div>';
 
             // Loans section
@@ -116,6 +125,16 @@
         }
 
         loadCustomerDetail();
+
+        function showImageModal(src) {
+            if (!src) return;
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
     </script>
 </body>
 </html>

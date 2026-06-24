@@ -479,10 +479,11 @@ p {
 }
 
 .stat-card {
-    background: var(--white);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
     padding: var(--space-6);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     border-left: 4px solid var(--gold);
     transition: all var(--transition-normal);
 }
@@ -660,7 +661,7 @@ p {
     margin-left: var(--sidebar-width);
     padding: var(--space-8);
     min-height: calc(100vh - var(--navbar-height));
-    background: var(--cream);
+    background: var(--white);
 }
 
 .sidebar-toggle {
@@ -780,9 +781,11 @@ p {
 .modal-overlay::-webkit-scrollbar {
     width: 8px;
 }
+
 .modal-overlay::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .modal-overlay::-webkit-scrollbar-thumb {
     background: var(--gold);
     border-radius: 4px;
@@ -819,6 +822,58 @@ p {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
+}
+
+/* ===== FULL SCREEN OVERLAY (Acts like a new page without sidebar) ===== */
+.full-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--gray-50);
+    z-index: 9999;
+    display: none;
+    overflow-y: auto;
+}
+
+.full-screen-overlay.active {
+    display: block;
+}
+
+.fs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-6) var(--space-8);
+    background: #050506;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.fs-header h2 {
+    color: var(--navy);
+    margin: 0;
+}
+
+.fs-close-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: var(--font-size-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.fs-close-btn:hover {
+    color: var(--gold-light);
+}
+
+.fs-content {
+    max-width: 900px;
+    margin: var(--space-8) auto;
+    padding: 0 var(--space-6);
 }
 
 .modal-close {

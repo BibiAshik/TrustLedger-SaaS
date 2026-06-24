@@ -25,8 +25,7 @@ public class ShopResponseDTO {
     private String shopName;
     private String ownerFullName;
     private String ownerPhotoPath;
-    private String aadhaarFrontPath;
-    private String aadhaarBackPath;
+    private String aadhaarDocumentPath;
     private String panPath;
     private String shopLicensePath;
     private String panNumber;
@@ -43,6 +42,7 @@ public class ShopResponseDTO {
     private String gstNumber;
     private String status;
     private String plan;
+    private String intendedPlan;
     private LocalDate subscriptionStartDate;
     private LocalDate subscriptionExpiryDate;
     private String subscriptionStatus;

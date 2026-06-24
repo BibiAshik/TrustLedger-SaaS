@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -72,8 +73,8 @@ public class ShopController {
         Long userId = extractUserId(authHeader);
         ShopResponseDTO shop = shopService.getShopByUserId(userId);
 
-        // Get recent payments
-        List<PaymentResponseDTO> recentPayments = paymentService.getRecentPayments(shop.getId(), 5);
+        // Get recent payments (fetch up to 50 for the View All modal)
+        List<PaymentResponseDTO> recentPayments = paymentService.getRecentPayments(shop.getId(), 50);
 
         // Get loans due this week
         var loansDueThisWeek = loanService.getLoansDueThisWeek(shop.getId());
@@ -94,10 +95,12 @@ public class ShopController {
     @PreAuthorize("hasRole('SHOP_OWNER')")
     public ResponseEntity<Map<String, Object>> createCustomer(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody CustomerCreateRequestDTO dto) {
+            @Valid @ModelAttribute CustomerCreateRequestDTO dto,
+            @RequestParam("aadhaarCard") MultipartFile aadhaarCard,
+            @RequestParam("photo") MultipartFile photo) {
 
         Long shopId = extractShopId(authHeader);
-        Map<String, Object> result = customerService.createCustomer(dto, shopId, null);
+        Map<String, Object> result = customerService.createCustomer(dto, shopId, aadhaarCard, photo);
         return ResponseEntity.ok(result);
     }
 
@@ -139,6 +142,17 @@ public class ShopController {
 
         Long shopId = extractShopId(authHeader);
         return ResponseEntity.ok(customerService.resetCustomerPassword(id, shopId));
+    }
+
+    /** Deletes a customer completely */
+    @DeleteMapping("/api/shop/customers/{id}")
+    @PreAuthorize("hasRole('SHOP_OWNER')")
+    public ResponseEntity<Map<String, String>> deleteCustomer(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+
+        Long shopId = extractShopId(authHeader);
+        return ResponseEntity.ok(customerService.deleteCustomer(id, shopId));
     }
 
     // ==================== HELPER METHODS ====================

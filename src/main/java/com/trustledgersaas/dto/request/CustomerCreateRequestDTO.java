@@ -29,7 +29,7 @@ public class CustomerCreateRequestDTO {
     private String phone;
 
     /** Email is optional — phone is the primary login identifier */
-    @Email(message = "Please provide a valid email address")
+    @Pattern(regexp = "^$|^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "Please provide a valid email address")
     private String email;
 
     /** Date of birth in ISO format (yyyy-MM-dd) */

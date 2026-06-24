@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/tables.css">
 </head>
+
 <body>
 
     <nav class="navbar">
@@ -89,7 +91,7 @@
                 '<th>Date</th><th>Shop Name</th><th>Plan</th><th>Amount</th><th>Razorpay ID</th>' +
                 '</tr></thead><tbody>';
 
-            pageData.content.forEach(function(p) {
+            pageData.content.forEach(function (p) {
                 html += '<tr>' +
                     '<td data-label="Date">' + formatDate(p.paymentDate) + '</td>' +
                     '<td data-label="Shop">' + p.shopName + '</td>' +
@@ -107,4 +109,5 @@
         loadRevenue(0);
     </script>
 </body>
+
 </html>

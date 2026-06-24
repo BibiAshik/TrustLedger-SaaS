@@ -13,6 +13,7 @@ import com.trustledgersaas.repository.GoldLoanRepository;
 import com.trustledgersaas.repository.PaymentRepository;
 import com.trustledgersaas.repository.ShopRepository;
 import com.trustledgersaas.repository.UserRepository;
+import com.trustledgersaas.util.FileUploadUtil;
 import com.trustledgersaas.util.InterestCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +89,7 @@ public class CustomerService {
      */
     @Transactional
     public Map<String, Object> createCustomer(CustomerCreateRequestDTO dto, Long shopId,
-                                               MultipartFile aadhaarFront) {
+                                               MultipartFile aadhaarCard, MultipartFile photo) {
 
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new ResourceNotFoundException("Shop not found"));
@@ -127,7 +128,8 @@ public class CustomerService {
         user = userRepository.save(user);
 
         // Step 5: Save uploaded files
-        String aadhaarFrontPath = authService.saveFile(aadhaarFront, "customers/" + user.getId() + "/aadhaar");
+        String aadhaarFrontPath = FileUploadUtil.saveFile(aadhaarCard, "customers/" + user.getId() + "/aadhaar");
+        String photoPath = FileUploadUtil.saveFile(photo, "customers/" + user.getId() + "/photo");
 
         // Step 6: Create Customer record
         LocalDate dateOfBirth = null;
@@ -144,6 +146,7 @@ public class CustomerService {
                 .address(dto.getAddress())
                 .aadhaarNumber(dto.getAadhaarNumber())
                 .aadhaarFrontPath(aadhaarFrontPath)
+                .photoPath(photoPath)
                 .panNumber(dto.getPanNumber())
                 .shop(shop)
                 .user(user)
@@ -312,6 +315,36 @@ public class CustomerService {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Password has been reset for " + customer.getFullName());
         response.put("newPassword", newPassword);
+        return response;
+    }
+
+    /**
+     * Deletes a customer permanently.
+     *
+     * Purpose: Shop owner deletes a customer. Cascades to loans and payments.
+     * Input: Customer ID and Shop ID.
+     */
+    @Transactional
+    public Map<String, String> deleteCustomer(Long customerId, Long shopId) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+
+        if (!customer.getShop().getId().equals(shopId)) {
+            throw new InvalidRequestException("This customer does not belong to your shop.");
+        }
+
+        User customerUser = customer.getUser();
+
+        customerRepository.delete(customer);
+        
+        if (customerUser != null) {
+            userRepository.delete(customerUser);
+        }
+
+        log.info("Customer and associated data fully deleted: {} (ID: {}) by Shop ID: {}", customer.getFullName(), customerId, shopId);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Customer '" + customer.getFullName() + "' has been permanently deleted.");
         return response;
     }
 }

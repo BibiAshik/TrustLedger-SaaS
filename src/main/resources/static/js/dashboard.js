@@ -51,40 +51,54 @@ function renderShopDashboard(data) {
             '<div class="stat-card green"><div class="stat-value">' + formatCurrency(totalLoanVolume) + '</div><div class="stat-label">Total Loan Volume</div></div>';
     }
 
-    // Render recent payments
+    // Render recent payments (Main Dashboard: max 3)
     const paymentsEl = document.getElementById('recentPayments');
+    const allPaymentsEl = document.getElementById('allRecentPaymentsList');
     if (paymentsEl) {
         if (recentPayments.length === 0) {
             paymentsEl.innerHTML = '<p class="text-muted text-center p-4">No recent payments</p>';
+            if(allPaymentsEl) allPaymentsEl.innerHTML = '<p class="text-muted text-center p-4">No recent payments</p>';
         } else {
-            let html = '';
-            recentPayments.forEach(function(p) {
-                html += '<div class="list-item">' +
+            let dashboardHtml = '';
+            let modalHtml = '';
+            recentPayments.forEach(function(p, index) {
+                const itemHtml = '<div class="list-item">' +
                     '<div class="item-info"><div class="item-avatar">' + getInitials(p.customerName) + '</div>' +
                     '<div><div class="item-name">' + p.customerName + '</div>' +
                     '<div class="item-sub">' + p.loanDisplayId + ' · ' + p.paymentMode + '</div></div></div>' +
                     '<div class="item-right"><div class="item-amount">' + formatCurrency(p.amount) + '</div>' +
                     '<div class="item-date">' + formatDate(p.paymentDate) + '</div></div></div>';
+                
+                if (index < 3) dashboardHtml += itemHtml;
+                modalHtml += itemHtml;
             });
-            paymentsEl.innerHTML = html;
+            paymentsEl.innerHTML = dashboardHtml;
+            if(allPaymentsEl) allPaymentsEl.innerHTML = modalHtml;
         }
     }
 
-    // Render loans due this week
+    // Render loans due this week (Main Dashboard: max 3)
     const dueEl = document.getElementById('loansDueThisWeek');
+    const allDueEl = document.getElementById('allLoansDueList');
     if (dueEl) {
         if (loansDueThisWeek.length === 0) {
             dueEl.innerHTML = '<p class="text-muted text-center p-4">No loans due this week</p>';
+            if(allDueEl) allDueEl.innerHTML = '<p class="text-muted text-center p-4">No loans due this week</p>';
         } else {
-            let html = '';
-            loansDueThisWeek.forEach(function(loan) {
-                html += '<div class="list-item" onclick="window.location.href=\'/shop/loans/' + loan.id + '\'">' +
+            let dashboardHtml = '';
+            let modalHtml = '';
+            loansDueThisWeek.forEach(function(loan, index) {
+                const itemHtml = '<div class="list-item" onclick="window.location.href=\'/shop/loans/' + loan.id + '\'" style="cursor:pointer;">' +
                     '<div class="item-info"><div><div class="item-name">' + loan.loanId + '</div>' +
                     '<div class="item-sub">' + loan.customerName + ' · ' + loan.goldItemType + '</div></div></div>' +
                     '<div class="item-right"><div class="item-amount">' + formatCurrency(loan.balanceDue) + '</div>' +
                     '<div class="item-date">Due: ' + formatDate(loan.dueDate) + '</div></div></div>';
+                
+                if (index < 3) dashboardHtml += itemHtml;
+                modalHtml += itemHtml;
             });
-            dueEl.innerHTML = html;
+            dueEl.innerHTML = dashboardHtml;
+            if(allDueEl) allDueEl.innerHTML = modalHtml;
         }
     }
 }
@@ -355,27 +369,27 @@ async function submitCashPayment(event, loanId) {
 // ==================== LOAN LIFECYCLE ACTIONS ====================
 
 async function closeLoan(loanId) {
-    if (!confirm('Are you sure you want to close this loan? This means the customer has fully paid and the gold has been returned.')) return;
-
-    try {
-        await apiCall('/api/shop/loans/' + loanId + '/close', 'POST');
-        showToast('Loan closed successfully!', 'success');
-        loadLoanDetail(loanId);
-    } catch (error) {
-        showToast('Failed to close loan.', 'danger');
-    }
+    customConfirm('Are you sure you want to close this loan? This means the customer has fully paid and the gold has been returned.', async function() {
+        try {
+            await apiCall('/api/shop/loans/' + loanId + '/close', 'POST');
+            showToast('Loan closed successfully!', 'success');
+            loadLoanDetail(loanId);
+        } catch (error) {
+            showToast('Failed to close loan.', 'danger');
+        }
+    }, 'Close Loan');
 }
 
 async function seizeLoan(loanId) {
-    if (!confirm('⚠️ Are you sure you want to mark this loan as SEIZED? This means the gold item will NOT be returned to the customer. This action cannot be undone.')) return;
-
-    try {
-        await apiCall('/api/shop/loans/' + loanId + '/seize', 'POST');
-        showToast('Loan marked as seized.', 'warning');
-        loadLoanDetail(loanId);
-    } catch (error) {
-        showToast('Failed to seize loan.', 'danger');
-    }
+    customConfirm('⚠️ Are you sure you want to mark this loan as SEIZED? This means the gold item will NOT be returned to the customer. This action cannot be undone.', async function() {
+        try {
+            await apiCall('/api/shop/loans/' + loanId + '/seize', 'POST');
+            showToast('Loan marked as seized.', 'warning');
+            loadLoanDetail(loanId);
+        } catch (error) {
+            showToast('Failed to seize loan.', 'danger');
+        }
+    }, 'Seize Loan');
 }
 
 function showExtendDueDate(loanId) {
@@ -473,10 +487,11 @@ function renderShopList(pageData, isPending) {
         '</tr></thead><tbody>';
 
     pageData.content.forEach(function(shop) {
+        var displayPlan = shop.intendedPlan || shop.plan || 'BASIC';
         html += '<tr><td data-label="Shop">' + shop.shopName + '</td>' +
             '<td data-label="Owner">' + shop.ownerFullName + '</td>' +
             '<td data-label="City">' + shop.city + '</td>' +
-            '<td data-label="Plan"><span class="badge badge-' + (shop.plan || 'basic').toLowerCase() + '">' + (shop.plan || 'BASIC') + '</span></td>' +
+            '<td data-label="Plan"><span class="badge badge-' + displayPlan.toLowerCase() + '">' + displayPlan + '</span></td>' +
             '<td data-label="Status">' + getStatusBadge(shop.status) + '</td>' +
             '<td data-label="Registered">' + formatDate(shop.createdAt) + '</td>' +
             '<td>';
@@ -652,14 +667,39 @@ async function submitRejectShop() {
 }
 
 async function suspendShop(shopId) {
-    if (!confirm('⚠️ Suspend this shop? Their login and all customer logins will be blocked.')) return;
-    try {
-        await apiCall('/api/admin/shops/' + shopId + '/suspend', 'POST');
-        showToast('Shop suspended.', 'warning');
-        setTimeout(function() { window.location.reload(); }, 1000);
-    } catch (error) {
-        showToast('Failed to suspend shop.', 'danger');
-    }
+    customConfirm('⚠️ Suspend this shop? Their login and all customer logins will be blocked.', async function() {
+        try {
+            await apiCall('/api/admin/shops/' + shopId + '/suspend', 'POST');
+            showToast('Shop suspended.', 'warning');
+            setTimeout(function() { window.location.reload(); }, 1000);
+        } catch (error) {
+            showToast('Failed to suspend shop.', 'danger');
+        }
+    }, 'Suspend Shop');
+}
+
+async function reactivateShop(shopId) {
+    customConfirm('✅ Reactivate this shop? They will regain full access instantly.', async function() {
+        try {
+            await apiCall('/api/admin/shops/' + shopId + '/reactivate', 'POST');
+            showToast('Shop reactivated successfully.', 'success');
+            setTimeout(function() { window.location.reload(); }, 1000);
+        } catch (error) {
+            showToast('Failed to reactivate shop.', 'danger');
+        }
+    }, 'Reactivate Shop');
+}
+
+async function deleteShop(shopId) {
+    customDeleteConfirm('🚨 PERMANENT DELETION 🚨\\n\\nAre you absolutely sure you want to delete this shop?\\nThis will PERMANENTLY erase:\\n- The shop account\\n- All their customers\\n- All their loans and payment records\\n\\nThis action CANNOT be undone.', async function() {
+        try {
+            await apiCall('/api/admin/shops/' + shopId, 'DELETE');
+            showToast('Shop deleted permanently.', 'success');
+            setTimeout(function() { window.location.href = '/admin/shop-approvals'; }, 1500);
+        } catch (error) {
+            showToast('Failed to delete shop.', 'danger');
+        }
+    }, 'Delete Shop');
 }
 
 // ==================== CUSTOMER DASHBOARD ====================
@@ -721,4 +761,18 @@ function renderCustomerDashboard(data) {
 
     html += '</div>';
     contentEl.innerHTML = html;
+}
+
+// ==================== DELETE CUSTOMER ====================
+
+async function deleteCustomer(customerId, customerName) {
+    customDeleteConfirm('🚨 PERMANENT DELETION 🚨\\n\\nAre you absolutely sure you want to delete customer "' + customerName + '"?\\nThis will PERMANENTLY erase:\\n- Their account\\n- All their loans\\n- All their payment records\\n\\nThis action CANNOT be undone.', async function() {
+        try {
+            await apiCall('/api/shop/customers/' + customerId, 'DELETE');
+            showToast('Customer deleted permanently.', 'success');
+            setTimeout(function() { window.location.href = '/shop/customers'; }, 1500);
+        } catch (error) {
+            showToast('Failed to delete customer.', 'danger');
+        }
+    }, 'Delete Customer');
 }

@@ -72,11 +72,8 @@ public class Shop {
 
     // ==================== KYC DOCUMENTS ====================
 
-    /** File path to Aadhaar card front image */
-    private String aadhaarFrontPath;
-
-    /** File path to Aadhaar card back image */
-    private String aadhaarBackPath;
+    /** File path to Aadhaar document */
+    private String aadhaarDocumentPath;
 
     /** File path to PAN card image/PDF */
     private String panPath;
@@ -138,6 +135,9 @@ public class Shop {
      */
     @Builder.Default
     private String plan = "BASIC";
+
+    /** Intended plan selected during registration */
+    private String intendedPlan;
 
     /** Date when the current subscription period started */
     private LocalDate subscriptionStartDate;

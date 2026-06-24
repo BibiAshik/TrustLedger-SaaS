@@ -147,44 +147,39 @@ public class ShopService {
         }
 
         shop.setStatus("APPROVED");
+        shop.setSubscriptionExpiryDate(LocalDate.now()); // Start 24-hour grace period immediately
         shopRepository.save(shop);
 
         log.info("Shop approved: {} (ID: {})", shop.getShopName(), shopId);
 
-        // Auto-create Razorpay Linked Account so the shop owner can receive
-        // customer payments directly when they upgrade to PRO plan.
-        // This is a non-blocking step — if Razorpay fails, approval still succeeds.
-        if (shop.getRazorpayLinkedAccountId() == null || shop.getRazorpayLinkedAccountId().isEmpty()) {
-            try {
-                String linkedAccountId = razorpayService.createLinkedAccount(
-                        shop.getShopName(),
-                        shop.getEmail(),
-                        shop.getPhone(),
-                        shop.getBankAccountNumber(),
-                        shop.getIfscCode(),
-                        shop.getAccountHolderName(),
-                        shop.getPanNumber() != null ? shop.getPanNumber() : "PENDING",
-                        shop.getBusinessType() != null ? shop.getBusinessType() : "individual");
-
-                shop.setRazorpayLinkedAccountId(linkedAccountId);
-                shopRepository.save(shop);
-
-                // If the account was created successfully (not a placeholder),
-                // also add the bank account and enable Route product
-                if (linkedAccountId != null && !linkedAccountId.startsWith("acc_pending_")) {
-                    razorpayService.addBankAccountToLinkedAccount(
-                            linkedAccountId,
+        // Auto-create Razorpay Linked Account only if they registered for the PRO plan.
+        if ("PRO".equalsIgnoreCase(shop.getIntendedPlan())) {
+            if (shop.getRazorpayLinkedAccountId() == null || shop.getRazorpayLinkedAccountId().isEmpty()) {
+                try {
+                    String linkedAccountId = razorpayService.createLinkedAccount(
+                            shop.getShopName(),
+                            shop.getEmail(),
+                            shop.getPhone(),
                             shop.getBankAccountNumber(),
                             shop.getIfscCode(),
-                            shop.getAccountHolderName());
-                }
+                            shop.getAccountHolderName(),
+                            shop.getPanNumber() != null ? shop.getPanNumber() : "PENDING",
+                            shop.getBusinessType() != null ? shop.getBusinessType() : "individual");
 
-                log.info("Razorpay Linked Account setup complete for shop: {} — ID: {}",
-                        shop.getShopName(), linkedAccountId);
-            } catch (Exception e) {
-                // Non-blocking — log and continue
-                log.error("Razorpay Linked Account creation failed for shop: {} — {}",
-                        shop.getShopName(), e.getMessage());
+                    shop.setRazorpayLinkedAccountId(linkedAccountId);
+                    shopRepository.save(shop);
+
+                    if (linkedAccountId != null && !linkedAccountId.startsWith("acc_pending_")) {
+                        razorpayService.addBankAccountToLinkedAccount(
+                                linkedAccountId,
+                                shop.getBankAccountNumber(),
+                                shop.getIfscCode(),
+                                shop.getAccountHolderName());
+                    }
+                    log.info("Razorpay Linked Account created for PRO shop on approval: {}", linkedAccountId);
+                } catch (Exception e) {
+                    log.error("Failed to auto-create Razorpay Linked Account during approval for shop {}: {}", shopId, e.getMessage());
+                }
             }
         }
 
@@ -263,6 +258,61 @@ public class ShopService {
     }
 
     /**
+     * Reactivates a suspended shop.
+     *
+     * Purpose: Super Admin restores a shop owner's access.
+     * Input: The shop ID to reactivate.
+     */
+    @Transactional
+    public Map<String, String> reactivateShop(Long shopId) {
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found with ID: " + shopId));
+
+        if (!"SUSPENDED".equals(shop.getStatus())) {
+            throw new InvalidRequestException("Only suspended shops can be reactivated.");
+        }
+
+        shop.setStatus("APPROVED"); // Or active, but APPROVED starts the grace period check cleanly
+        shopRepository.save(shop);
+
+        log.info("Shop reactivated: {} (ID: {})", shop.getShopName(), shopId);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Shop '" + shop.getShopName() + "' has been reactivated successfully.");
+        return response;
+    }
+
+    /**
+     * Completely deletes a suspended shop and all associated data.
+     *
+     * Purpose: Hard delete a shop. Cascades to customers, loans, payments, etc.
+     * Input: The shop ID to delete.
+     */
+    @Transactional
+    public Map<String, String> deleteShop(Long shopId) {
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found with ID: " + shopId));
+
+        if (!"SUSPENDED".equals(shop.getStatus())) {
+            throw new InvalidRequestException("For safety, only suspended shops can be deleted.");
+        }
+
+        com.trustledgersaas.entity.User shopUser = shop.getUser();
+
+        shopRepository.delete(shop);
+        
+        if (shopUser != null) {
+            userRepository.delete(shopUser);
+        }
+
+        log.info("Shop and associated data fully deleted: {} (ID: {})", shop.getShopName(), shopId);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Shop '" + shop.getShopName() + "' and all its data have been permanently deleted.");
+        return response;
+    }
+
+    /**
      * Activates a shop's subscription after payment.
      *
      * Purpose: After a shop owner pays for a subscription, activate their account.
@@ -278,8 +328,17 @@ public class ShopService {
         // Set subscription details
         shop.setStatus("ACTIVE");
         shop.setPlan(planType);
-        shop.setSubscriptionStartDate(LocalDate.now());
-        shop.setSubscriptionExpiryDate(LocalDate.now().plusMonths(1)); // 1 month subscription
+        if (shop.getSubscriptionStartDate() == null) {
+            shop.setSubscriptionStartDate(LocalDate.now());
+        }
+        
+        LocalDate currentExpiry = shop.getSubscriptionExpiryDate();
+        if (currentExpiry != null && currentExpiry.isAfter(LocalDate.now())) {
+            shop.setSubscriptionExpiryDate(currentExpiry.plusMonths(1));
+        } else {
+            shop.setSubscriptionExpiryDate(LocalDate.now().plusMonths(1));
+        }
+        
         shop.setSubscriptionStatus("ACTIVE");
         shopRepository.save(shop);
 
@@ -293,6 +352,35 @@ public class ShopService {
                 .razorpayOrderId(razorpayOrderId)
                 .build();
         subscriptionPaymentRepository.save(payment);
+
+        // If they just bought PRO, ensure they have a Razorpay Linked Account
+        if ("PRO".equalsIgnoreCase(planType) && (shop.getRazorpayLinkedAccountId() == null || shop.getRazorpayLinkedAccountId().isEmpty())) {
+            try {
+                String linkedAccountId = razorpayService.createLinkedAccount(
+                        shop.getShopName(),
+                        shop.getEmail(),
+                        shop.getPhone(),
+                        shop.getBankAccountNumber(),
+                        shop.getIfscCode(),
+                        shop.getAccountHolderName(),
+                        shop.getPanNumber() != null ? shop.getPanNumber() : "PENDING",
+                        shop.getBusinessType() != null ? shop.getBusinessType() : "individual");
+
+                shop.setRazorpayLinkedAccountId(linkedAccountId);
+                shopRepository.save(shop);
+
+                if (linkedAccountId != null && !linkedAccountId.startsWith("acc_pending_")) {
+                    razorpayService.addBankAccountToLinkedAccount(
+                            linkedAccountId,
+                            shop.getBankAccountNumber(),
+                            shop.getIfscCode(),
+                            shop.getAccountHolderName());
+                }
+                log.info("Razorpay Linked Account created for PRO upgrade: {}", linkedAccountId);
+            } catch (Exception e) {
+                log.error("Failed to auto-create Razorpay Linked Account during PRO upgrade for shop {}: {}", shopId, e.getMessage());
+            }
+        }
 
         log.info("Subscription activated for shop: {} — Plan: {}", shop.getShopName(), planType);
 

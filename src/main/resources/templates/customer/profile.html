@@ -8,10 +8,11 @@
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/forms.css">
+    <link rel="stylesheet" href="/css/customer-theme.css">
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-brand"><img src="/images/logo-dark.png" alt="Trust Ledger"><span>My Loans</span></div>
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Loans</span></div>
         <div class="navbar-menu"><button class="btn btn-outline" onclick="logout()">Logout</button></div>
     </nav>
 
@@ -19,15 +20,15 @@
         <aside class="sidebar">
             <nav class="sidebar-nav">
                 <div class="sidebar-section-title">My Account</div>
-                <a href="/customer/dashboard"><span class="nav-icon">📊</span> My Loans</a>
-                <a href="/customer/payment-history"><span class="nav-icon">📜</span> Payment History</a>
-                <a href="/customer/profile" class="active"><span class="nav-icon">👤</span> Profile</a>
+                <a href="/customer/dashboard">My Loans</a>
+                <a href="/customer/payment-history">Payment History</a>
+                <a href="/customer/profile" class="active">Profile</a>
             </nav>
         </aside>
 
         <main class="main-content">
             <div class="page-header">
-                <h1>👤 My Profile</h1>
+                <h1>My Profile</h1>
             </div>
 
             <div id="profileContent">
@@ -38,9 +39,9 @@
 
     <nav class="bottom-nav">
         <div class="bottom-nav-items">
-            <a href="/customer/dashboard" class="bottom-nav-item"><span class="nav-icon">📊</span> Loans</a>
-            <a href="/customer/payment-history" class="bottom-nav-item"><span class="nav-icon">📜</span> History</a>
-            <a href="/customer/profile" class="bottom-nav-item active"><span class="nav-icon">👤</span> Profile</a>
+            <a href="/customer/dashboard" class="bottom-nav-item">Loans</a>
+            <a href="/customer/payment-history" class="bottom-nav-item">History</a>
+            <a href="/customer/profile" class="bottom-nav-item active">Profile</a>
         </div>
     </nav>
 
@@ -61,7 +62,10 @@
             var html = '';
 
             // Profile card
-            html += '<div class="card mb-6" style="text-align:center;padding:var(--space-10);">';
+            html += '<div class="card mb-6" style="text-align:center;padding:var(--space-10); position: relative;">';
+            html += '<div style="margin-bottom: 1rem; display: flex; justify-content: center;">';
+            html += '<img src="' + (customer.photoPath ? customer.photoPath : 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0Q0QTAxNyI+PHBhdGggZD0iTTEyIDEyYzIuMjEgMCA0LTEuNzkgNC00czEuNzktNCA0LTRzLTQgMS43OS00IDQtMS43OSA0LTQgNHptMCAyYy0yLjY3IDAtOCAxLjM0LTggNHYySDIwdi0yYzAtMi42Ni01LjMzLTQtOC00eiIvPjwvc3ZnPg==') + '" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #FDE68A; background: #FFFBEB;">';
+            html += '</div>';
             html += '<h2 style="margin-bottom:var(--space-1);">' + customer.fullName + '</h2>';
             html += '<p class="text-muted">' + customer.phone + ' · ' + customer.email + '</p>';
             html += '</div>';
@@ -75,15 +79,15 @@
             html += '<div class="detail-group"><div class="detail-label">Date of Birth</div><div class="detail-value">' + formatDate(customer.dateOfBirth) + '</div></div>';
             html += '<div class="detail-group"><div class="detail-label">Gender</div><div class="detail-value">' + (customer.gender || '—') + '</div></div>';
             html += '<div class="detail-group"><div class="detail-label">Address</div><div class="detail-value">' + customer.address + '</div></div>';
-            html += '<div class="detail-group"><div class="detail-label">Aadhaar</div><div class="detail-value">' + (customer.maskedAadhaarNumber || 'XXXX XXXX XXXX') + '</div></div>';
+            html += '<div class="detail-group"><div class="detail-label">Aadhaar</div><div class="detail-value">' + (customer.aadhaarNumber || 'XXXX XXXX XXXX') + '</div></div>';
             html += '</div></div>';
 
             // Change password
-            html += '<div class="card"><div class="card-header"><h3>🔑 Change Password</h3></div>';
+            html += '<div class="card"><div class="card-header"><h3>Change Password</h3></div>';
             html += '<form onsubmit="changeCustomerPassword(event)" style="max-width:400px;">';
             html += '<div class="form-group"><label>Current Password</label><input type="password" id="currentPwd" class="form-input" required></div>';
             html += '<div class="form-group"><label>New Password</label><input type="password" id="newPwd" class="form-input" minlength="6" required></div>';
-            html += '<button type="submit" class="btn btn-navy">Update Password</button></form></div>';
+            html += '<button type="submit" class="btn btn-gold">Update Password</button></form></div>';
 
             document.getElementById('profileContent').innerHTML = html;
         }

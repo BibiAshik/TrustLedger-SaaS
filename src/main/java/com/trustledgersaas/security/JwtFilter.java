@@ -82,17 +82,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 log.debug("Authenticated user: {} with role: {}", email, role);
             }
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Unauthorized\", \"expired\": true}");
-            return;
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Unauthorized\", \"expired\": false}");
+            
+            if (e.getClass().getName().equals("io.jsonwebtoken.ExpiredJwtException")) {
+                response.getWriter().write("{\"error\": \"Unauthorized\", \"expired\": true}");
+            } else {
+                response.getWriter().write("{\"error\": \"Unauthorized\", \"expired\": false}");
+            }
             return;
         }
 

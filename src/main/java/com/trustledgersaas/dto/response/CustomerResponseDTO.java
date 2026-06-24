@@ -45,4 +45,10 @@ public class CustomerResponseDTO {
 
     /** Total outstanding amount across all this customer's loans */
     private String totalOutstanding;
+    
+    /** The unmasked Aadhaar number, as requested by the user for shop owner viewing */
+    private String aadhaarNumber;
+    
+    /** The path to the uploaded passport photo */
+    private String photoPath;
 }

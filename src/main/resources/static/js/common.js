@@ -48,6 +48,8 @@ function logout() {
     clearAuth();
     if (role === 'ROLE_SUPER_ADMIN') {
         window.location.href = '/admin/login';
+    } else if (role === 'ROLE_CUSTOMER') {
+        window.location.href = '/customer/login';
     } else {
         window.location.href = '/';
     }
@@ -162,20 +164,33 @@ async function apiCall(url, method, body, _isRetry = false) {
         } catch (e) {
             // Ignore json parse errors
         }
-        
+
         if (!_isRetry) {
             return await apiCall(url, method, body, true);
         }
-        
+
         logout();
         return null;
     }
 
-    // Handle 403 Forbidden — no access
+    // Handle 403 Forbidden — no access or subscription expired
     if (response.status === 403) {
+        try {
+            const errData = await response.json();
+            if (errData.error === 'Subscription expired') {
+                showToast(errData.message, 'danger');
+                setTimeout(function () {
+                    window.location.href = '/shop/settings';
+                }, 1500);
+                return null;
+            }
+        } catch (e) {
+            // Ignore json parse errors
+        }
+
         clearAuth();
         showToast('Access denied. Please log in with the correct account.', 'danger');
-        setTimeout(function() {
+        setTimeout(function () {
             redirectToLoginForCurrentPage();
         }, 700);
         return null;
@@ -288,13 +303,116 @@ function showToast(message, type) {
     container.appendChild(toast);
 
     // Auto-remove after 4 seconds
-    setTimeout(function() {
+    setTimeout(function () {
         toast.style.animation = 'toastSlideOut 0.3s ease forwards';
-        setTimeout(function() {
+        setTimeout(function () {
             toast.remove();
         }, 300);
     }, 4000);
 }
+
+// ==================== CUSTOM MODALS ====================
+
+/**
+ * Custom Alert Modal to replace native alert()
+ */
+window.customAlert = function (message, title) {
+    title = title || 'Alert';
+    const modalId = 'custom-alert-modal-' + Date.now();
+
+    const html = `
+    <div class="modal-overlay active" id="${modalId}" style="z-index: 9999;">
+        <div class="modal" style="max-width: 400px; text-align: center; padding-top: 30px;">
+            <button class="modal-close" onclick="document.getElementById('${modalId}').remove()">&times;</button>
+            <h2 style="margin-bottom: 15px; color: var(--gold-500);">${title}</h2>
+            <p style="margin-bottom: 25px; line-height: 1.5; color: var(--text-light); white-space: pre-wrap;">${message}</p>
+            <button class="btn btn-gold" style="width: 100%;" onclick="document.getElementById('${modalId}').remove()">OK</button>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+};
+
+/**
+ * Custom Confirm Modal to replace native confirm()
+ */
+window.customConfirm = function (message, onConfirm, title) {
+    title = title || 'Confirm Action';
+    const modalId = 'custom-confirm-modal-' + Date.now();
+
+    // Create a globally accessible callback wrapper since onclick needs a string
+    const callbackName = 'confirmCallback_' + Date.now();
+    window[callbackName] = function () {
+        document.getElementById(modalId).remove();
+        delete window[callbackName];
+        if (onConfirm && typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    };
+
+    const html = `
+    <div class="modal-overlay active" id="${modalId}" style="z-index: 9999;">
+        <div class="modal" style="max-width: 450px; text-align: center; padding-top: 30px;">
+            <button class="modal-close" onclick="document.getElementById('${modalId}').remove()">&times;</button>
+            <h2 style="margin-bottom: 15px; color: var(--gold-500);">${title}</h2>
+            <p style="margin-bottom: 25px; line-height: 1.5; color: var(--text-light); white-space: pre-wrap;">${message}</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="btn btn-outline" style="flex: 1;" onclick="document.getElementById('${modalId}').remove()">Cancel</button>
+                <button class="btn btn-gold" style="flex: 1;" onclick="window.${callbackName}()">Confirm</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+};
+
+/**
+ * Custom Confirm Modal for high-risk deletions (requires typing 'DELETE')
+ */
+window.customDeleteConfirm = function (message, onConfirm, title) {
+    title = title || 'Confirm Deletion';
+    const modalId = 'custom-delete-modal-' + Date.now();
+    const inputId = 'custom-delete-input-' + Date.now();
+    const errorId = 'custom-delete-error-' + Date.now();
+
+    // Create a globally accessible callback wrapper
+    const callbackName = 'deleteCallback_' + Date.now();
+    window[callbackName] = function () {
+        const inputVal = document.getElementById(inputId).value;
+        if (inputVal === 'DELETE') {
+            document.getElementById(modalId).remove();
+            delete window[callbackName];
+            if (onConfirm && typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        } else {
+            document.getElementById(errorId).style.display = 'block';
+        }
+    };
+
+    const html = `
+    <div class="modal-overlay active" id="${modalId}" style="z-index: 9999;">
+        <div class="modal" style="max-width: 450px; text-align: center; padding-top: 30px;">
+            <button class="modal-close" onclick="document.getElementById('${modalId}').remove()">&times;</button>
+            <h2 style="margin-bottom: 15px; color: var(--gold-500);">${title}</h2>
+            <p style="margin-bottom: 25px; line-height: 1.5; color: var(--text-light); white-space: pre-wrap;">${message}</p>
+            
+            <div style="margin-bottom: 25px; text-align: left;">
+                <label for="${inputId}" style="display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-light);">Type DELETE to confirm:</label>
+                <input type="text" id="${inputId}" class="form-input" placeholder="DELETE" style="width: 100%;" autocomplete="off" oninput="document.getElementById('${errorId}').style.display='none'">
+                <p id="${errorId}" class="error-message" style="display: none; margin-top: 4px;">You must type DELETE exactly.</p>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="btn btn-outline" style="flex: 1;" onclick="document.getElementById('${modalId}').remove()">Cancel</button>
+                <button class="btn btn-danger" style="flex: 1;" onclick="window.${callbackName}()">Confirm Delete</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+};
+
 
 // ==================== SIDEBAR TOGGLE (Mobile) ====================
 
@@ -331,7 +449,7 @@ function initializeMobileSidebar() {
     toggleButton.className = 'sidebar-toggle';
     toggleButton.setAttribute('aria-label', 'Open navigation menu');
     toggleButton.innerHTML = '<span></span><span></span><span></span>';
-    toggleButton.addEventListener('click', function(event) {
+    toggleButton.addEventListener('click', function (event) {
         event.stopPropagation();
         toggleSidebar();
     });
@@ -364,7 +482,7 @@ function initializeLogoutVisibility() {
     }
 
     const logoutButtons = document.querySelectorAll('button[onclick="logout()"]');
-    logoutButtons.forEach(function(button) {
+    logoutButtons.forEach(function (button) {
         button.style.display = 'none';
     });
 }
@@ -385,7 +503,7 @@ function buildPagination(pageData, callbackFn) {
 
     // Previous button
     html += '<button onclick="' + callbackFn + '(' + (pageData.number - 1) + ')" ' +
-            (pageData.first ? 'disabled' : '') + '>← Prev</button>';
+        (pageData.first ? 'disabled' : '') + '>← Prev</button>';
 
     // Page numbers
     const startPage = Math.max(0, pageData.number - 2);
@@ -393,17 +511,17 @@ function buildPagination(pageData, callbackFn) {
 
     for (let i = startPage; i <= endPage; i++) {
         html += '<button onclick="' + callbackFn + '(' + i + ')" ' +
-                'class="' + (i === pageData.number ? 'active' : '') + '">' +
-                (i + 1) + '</button>';
+            'class="' + (i === pageData.number ? 'active' : '') + '">' +
+            (i + 1) + '</button>';
     }
 
     // Next button
     html += '<button onclick="' + callbackFn + '(' + (pageData.number + 1) + ')" ' +
-            (pageData.last ? 'disabled' : '') + '>Next →</button>';
+        (pageData.last ? 'disabled' : '') + '>Next →</button>';
 
     // Page info
     html += '<span class="page-info">Page ' + (pageData.number + 1) +
-            ' of ' + pageData.totalPages + '</span>';
+        ' of ' + pageData.totalPages + '</span>';
 
     html += '</div>';
     return html;
@@ -416,9 +534,8 @@ function buildPagination(pageData, callbackFn) {
  * Input: "1234 5678 9012" → Output: "XXXX XXXX 9012"
  */
 function maskAadhaar(aadhaar) {
-    if (!aadhaar || aadhaar.length < 4) return 'XXXX XXXX XXXX';
-    const lastFour = aadhaar.replace(/\s/g, '').slice(-4);
-    return 'XXXX XXXX ' + lastFour;
+    if (!aadhaar) return 'N/A';
+    return aadhaar;
 }
 
 /**
@@ -499,7 +616,7 @@ function showEmptyState(containerId, message, icon) {
 function getInitials(name) {
     if (!name) return '?';
     return name.split(' ')
-        .map(function(word) { return word.charAt(0).toUpperCase(); })
+        .map(function (word) { return word.charAt(0).toUpperCase(); })
         .slice(0, 2)
         .join('');
 }
@@ -507,7 +624,7 @@ function getInitials(name) {
 // ==================== EVENT LISTENERS ====================
 
 // Close sidebar when clicking outside on mobile
-document.addEventListener('click', function(event) {
+document.addEventListener('click', function (event) {
     const sidebar = document.querySelector('.sidebar');
     const toggleBtn = document.querySelector('.sidebar-toggle');
     if (sidebar && sidebar.classList.contains('open') &&
@@ -528,3 +645,4 @@ document.addEventListener('DOMContentLoaded', requireRoleForCurrentPage);
 const style = document.createElement('style');
 style.textContent = '@keyframes toastSlideOut { to { opacity: 0; transform: translateX(100px); } }';
 document.head.appendChild(style);
+

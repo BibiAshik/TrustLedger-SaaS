@@ -8,10 +8,11 @@
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/tables.css">
+    <link rel="stylesheet" href="/css/customer-theme.css">
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-brand"><img src="/images/logo-dark.png" alt="Trust Ledger"><span>My Loans</span></div>
+        <div class="navbar-brand"><img src="/images/logo-light.png" alt="Trust Ledger"><span>My Loans</span></div>
         <div class="navbar-menu"><button class="btn btn-outline" onclick="logout()">Logout</button></div>
     </nav>
 
@@ -19,9 +20,9 @@
         <aside class="sidebar">
             <nav class="sidebar-nav">
                 <div class="sidebar-section-title">My Account</div>
-                <a href="/customer/dashboard" class="active"><span class="nav-icon">📊</span> My Loans</a>
-                <a href="/customer/payment-history"><span class="nav-icon">📜</span> Payment History</a>
-                <a href="/customer/profile"><span class="nav-icon">👤</span> Profile</a>
+                <a href="/customer/dashboard" class="active">My Loans</a>
+                <a href="/customer/payment-history">Payment History</a>
+                <a href="/customer/profile">Profile</a>
             </nav>
         </aside>
 
@@ -41,9 +42,9 @@
 
     <nav class="bottom-nav">
         <div class="bottom-nav-items">
-            <a href="/customer/dashboard" class="bottom-nav-item active"><span class="nav-icon">📊</span> Loans</a>
-            <a href="/customer/payment-history" class="bottom-nav-item"><span class="nav-icon">📜</span> History</a>
-            <a href="/customer/profile" class="bottom-nav-item"><span class="nav-icon">👤</span> Profile</a>
+            <a href="/customer/dashboard" class="bottom-nav-item active">Loans</a>
+            <a href="/customer/payment-history" class="bottom-nav-item">History</a>
+            <a href="/customer/profile" class="bottom-nav-item">Profile</a>
         </div>
     </nav>
 
@@ -65,7 +66,7 @@
 
                 // Seizure Warning
                 if (loan.seizureWarningShown) {
-                    html += '<div class="seizure-warning"><div class="warning-icon">⚠️</div>' +
+                    html += '<div class="seizure-warning">' +
                         '<div class="warning-text"><h4>Gold Seizure Warning</h4>' +
                         '<p>This loan is 30+ days overdue. Your <strong>' + loan.goldItemType + '</strong> (' + loan.goldWeight + 'g) will be seized. Contact the shop immediately.</p></div></div>';
                 }
@@ -85,7 +86,7 @@
 
                 // Pay Now button
                 if (loan.status === 'ACTIVE' || loan.status === 'OVERDUE') {
-                    html += '<a href="/customer/pay/' + loan.id + '" class="btn btn-gold btn-lg btn-block mb-6">💰 Pay Now</a>';
+                    html += '<a href="/customer/pay/' + loan.id + '" class="btn btn-gold btn-lg btn-block mb-6">Pay Now</a>';
                 }
 
                 // Payment History
@@ -98,7 +99,7 @@
                         html += '<tr><td data-label="Date">' + formatDate(p.paymentDate) + '</td>' +
                             '<td data-label="Mode"><span class="payment-mode ' + (p.paymentMode === 'CASH' ? 'cash' : 'online') + '">' + p.paymentMode + '</span></td>' +
                             '<td data-label="Amount" class="td-amount">' + formatCurrency(p.amount) + '</td>' +
-                            '<td data-label="Receipt">' + (p.receiptNumber ? '<button type="button" onclick="authenticatedDownload(\'/api/customer/payments/' + p.id + '/receipt\', \'receipt-' + p.receiptNumber + '.pdf\')" class="btn btn-sm btn-outline">📄 Download</button>' : '—') + '</td></tr>';
+                            '<td data-label="Receipt">' + (p.receiptNumber ? '<button type="button" onclick="authenticatedDownload(\'/api/customer/payments/' + p.id + '/receipt\', \'receipt-' + p.receiptNumber + '.pdf\')" class="btn btn-sm btn-outline">Download</button>' : '—') + '</td></tr>';
                     });
                     html += '</tbody></table>';
                 }

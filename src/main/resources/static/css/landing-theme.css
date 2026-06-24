@@ -1,0 +1,546 @@
+/* =============================================================================
+   LANDING-THEME.CSS — Trust Ledger Premium 3D Dark Landing Page
+   ============================================================================= */
+
+:root {
+    --landing-bg: #030303;
+    --landing-card-bg: rgba(20, 20, 22, 0.7);
+    --gold-primary: #D4A017;
+    --gold-bright: #FDE68A;
+    --gold-glow: rgba(212, 160, 23, 0.2);
+    --text-white: #FFFFFF;
+    --text-muted: #9CA3AF;
+    --border-gold: rgba(212, 160, 23, 0.3);
+}
+
+body.landing-page {
+    background-color: var(--landing-bg);
+    color: var(--text-white);
+    font-family: var(--font-family);
+    margin: 0;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Base structural containers */
+.landing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    position: relative;
+    z-index: 10;
+}
+
+/* Navbar */
+.landing-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-6) 0;
+}
+
+.landing-nav .logo img {
+    height: 48px;
+}
+
+.nav-links {
+    display: flex;
+    gap: var(--space-8);
+    align-items: center;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-white);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.nav-item i {
+    color: var(--gold-primary);
+}
+
+.btn-contact {
+    border: 1px solid var(--border-gold);
+    background: transparent;
+    color: var(--gold-primary);
+    padding: 10px 24px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.btn-contact:hover {
+    background: var(--gold-glow);
+    border-color: var(--gold-primary);
+}
+
+/* Hero Section Layout */
+.hero-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-10);
+    position: relative;
+}
+
+.hero-left {
+    flex: 1;
+    max-width: 650px;
+}
+
+.hero-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+}
+
+/* The massive 3D gold safe placeholder */
+.hero-3d-graphic {
+    width: 650px;
+    height: auto;
+    position: absolute;
+    right: -20px;
+    top: -300px;
+    z-index: -1;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 40px var(--gold-glow));
+    pointer-events: none;
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 75%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 75%);
+}
+
+/* Security Badge Floating */
+.security-badge {
+    position: absolute;
+    right: 50px;
+    top: 50px;
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px solid var(--border-gold);
+    backdrop-filter: blur(10px);
+    padding: var(--space-5);
+    border-radius: 16px;
+    text-align: center;
+    width: 140px;
+}
+
+.security-badge i {
+    color: var(--gold-primary);
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.security-badge h4 {
+    margin: 0 0 5px 0;
+    color: var(--text-white);
+}
+
+.security-badge p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Typography */
+.trust-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border-gold);
+    padding: 6px 16px;
+    border-radius: 20px;
+    color: var(--gold-primary);
+    font-size: 0.85rem;
+    margin-bottom: var(--space-6);
+}
+
+.hero-title {
+    font-size: 4rem;
+    line-height: 1.1;
+    margin: 0 0 var(--space-6) 0;
+    font-weight: 700;
+}
+
+.hero-title span {
+    color: var(--gold-primary);
+}
+
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 500px;
+    margin-bottom: var(--space-8);
+}
+
+/* Features Grid Horizontal */
+.hero-features {
+    display: flex;
+    gap: var(--space-6);
+    margin-bottom: var(--space-10);
+}
+
+.hero-feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 80px;
+}
+
+.hero-feature .icon-box {
+    width: 50px;
+    height: 50px;
+    border: 1px solid var(--border-gold);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    background: rgba(212, 160, 23, 0.05);
+}
+
+.hero-feature h5 {
+    margin: 0 0 4px 0;
+    font-size: 0.8rem;
+    color: var(--text-white);
+}
+
+.hero-feature p {
+    margin: 0;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+/* Action Cards */
+.action-cards {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+}
+
+.action-card {
+    background: rgba(20, 20, 22, 0.95);
+    border: 1px solid var(--border-gold);
+    border-radius: 20px;
+    padding: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    flex: 1;
+    transition: all 0.3s;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
+}
+
+.action-card:hover {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 30px var(--gold-glow);
+    transform: translateY(-2px) translateZ(0);
+}
+
+.action-card-img {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 65%);
+    mask-image: radial-gradient(circle, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 65%);
+}
+
+.action-card-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    color: var(--text-white);
+}
+
+.action-card-content p {
+    margin: 0 0 15px 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.btn-action {
+    background: transparent;
+    border: 1px solid var(--gold-primary);
+    color: var(--gold-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.btn-action:hover {
+    background: var(--gold-primary);
+    color: var(--landing-bg);
+}
+
+.or-divider {
+    color: var(--gold-primary);
+    font-weight: bold;
+    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Trust Bar */
+.trust-bar {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-gold);
+    border-bottom: 1px solid var(--border-gold);
+    padding: var(--space-6) 0;
+    margin-top: var(--space-12);
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.trust-item i {
+    color: var(--gold-primary);
+    font-size: 24px;
+}
+
+.trust-item h4 {
+    margin: 0 0 2px 0;
+    color: var(--text-white);
+    font-size: 0.95rem;
+}
+
+.trust-item p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* PRICING SECTION */
+.pricing-section {
+    padding: 100px 0;
+    text-align: center;
+    position: relative;
+}
+
+.pricing-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border-gold);
+    padding: 6px 16px;
+    border-radius: 20px;
+    color: var(--gold-primary);
+    font-size: 0.85rem;
+    margin-bottom: var(--space-6);
+    background: rgba(212, 160, 23, 0.05);
+}
+
+.pricing-title {
+    font-size: 2.5rem;
+    margin: 0 0 var(--space-4) 0;
+}
+
+.pricing-title span {
+    color: var(--gold-primary);
+}
+
+.pricing-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 60px;
+}
+
+.pricing-grid {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    max-width: 900px;
+    margin: 0 auto 60px auto;
+}
+
+.pricing-card {
+    flex: 1;
+    background: rgba(15, 15, 15, 0.8);
+    border: 1px solid var(--border-gold);
+    border-radius: 24px;
+    padding: 50px 40px;
+    text-align: left;
+    backdrop-filter: blur(10px);
+    position: relative;
+    transition: all 0.3s;
+}
+
+.pricing-card:hover {
+    transform: translateY(-5px);
+}
+
+.pricing-card.pro {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 40px var(--gold-glow);
+}
+
+.pricing-card.pro::before {
+    content: '★ RECOMMENDED';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold-primary);
+    color: #000;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.plan-icon {
+    width: 50px;
+    height: 50px;
+    border: 1px solid var(--gold-primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-primary);
+    font-size: 1.5rem;
+    margin: 0 auto 20px auto;
+}
+
+.pricing-card h3 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 0 0 10px 0;
+}
+
+.price {
+    text-align: center;
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    line-height: 1;
+}
+
+.price span {
+    font-size: 1rem;
+    font-weight: normal;
+    color: var(--text-muted);
+}
+
+.price-desc {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--border-gold);
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 40px 0;
+}
+
+.feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: var(--text-white);
+    font-size: 0.95rem;
+}
+
+.feature-list li .check {
+    color: #10B981;
+}
+
+.feature-list li .cross {
+    color: var(--text-muted);
+}
+
+.btn-plan {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-plan.basic {
+    background: transparent;
+    border: 1px solid var(--gold-primary);
+    color: var(--gold-primary);
+}
+
+.btn-plan.basic:hover {
+    background: var(--gold-glow);
+}
+
+.btn-plan.pro {
+    background: linear-gradient(135deg, var(--gold-primary), #B8860B);
+    border: none;
+    color: #000;
+    box-shadow: 0 4px 15px var(--gold-glow);
+}
+
+.btn-plan.pro:hover {
+    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.4);
+    transform: translateY(-2px);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 992px) {
+    .hero-wrapper { flex-direction: column; text-align: center; }
+    .hero-left { max-width: 100%; margin-bottom: 40px; }
+    .hero-3d-graphic { position: relative; top: 0; right: 0; width: 100%; max-width: 400px; margin: 0 auto; }
+    .security-badge { display: none; }
+    .hero-features { flex-wrap: wrap; justify-content: center; }
+    .action-cards { flex-direction: column; gap: 20px; }
+    .action-card { width: 100%; box-sizing: border-box; max-width: 450px; margin: 0 auto; }
+    .or-divider { margin: 10px 0; }
+    .trust-bar { flex-direction: column; gap: 30px; text-align: center; }
+    .trust-item { flex-direction: column; gap: 10px; }
+    .trust-item div { text-align: center !important; }
+    .pricing-grid { flex-direction: column; }
+    .pricing-card { width: 100%; box-sizing: border-box; max-width: 450px; margin: 0 auto; }
+}
+@media (max-width: 768px) {
+    .landing-nav { flex-direction: column; gap: 20px; }
+    .nav-links { flex-wrap: wrap; justify-content: center; }
+    .hero-title { font-size: 2.5rem; }
+    .hero-subtitle { font-size: 1rem; }
+    .action-card { flex-direction: column; text-align: center; }
+    .btn-action { justify-content: center; }
+    .landing-footer > div > div { flex-direction: column !important; }
+}

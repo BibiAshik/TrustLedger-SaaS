@@ -49,13 +49,12 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> registerShop(
             @Valid @ModelAttribute ShopRegisterRequestDTO dto,
             @RequestParam("ownerPhoto") MultipartFile ownerPhoto,
-            @RequestParam("aadhaarFront") MultipartFile aadhaarFront,
-            @RequestParam("aadhaarBack") MultipartFile aadhaarBack,
+            @RequestParam("aadhaarDocument") MultipartFile aadhaarDocument,
             @RequestParam("panCard") MultipartFile panDocument,
             @RequestParam(value = "shopLicense", required = false) MultipartFile shopLicense) {
 
         Map<String, Object> result = authService.registerShopOwner(dto, ownerPhoto,
-                aadhaarFront, aadhaarBack, panDocument, shopLicense);
+                aadhaarDocument, panDocument, shopLicense);
         return ResponseEntity.ok(result);
     }
 
