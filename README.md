@@ -110,33 +110,21 @@ Run the app using the `local` profile to automatically load your secrets:
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-### 5. Access the Application
-- **Main Website / Shop Owner Login:** `http://localhost:8080/`
-- **Customer Login:** `http://localhost:8080/customer/login`
-- **Super Admin Login:** `http://localhost:8080/admin/login`
-
-*(Default Super Admin credentials are created on startup: `admin@trustledger.com` / `Admin@123`)*
-
 ---
 
-## 🐳 Docker Deployment
+## 🌐 Accessing the Portals
 
-The project includes a `docker-compose.yml` file for easy deployment.
+Once the application is running locally, you can access the different role-based portals using the following links:
 
-```bash
-# Build and start the MySQL and Spring Boot containers in the background
-docker-compose up -d --build
+### 1. Main Website & Shop Owner Portal
+- **Link:** [http://localhost:8080/](http://localhost:8080/)
+- **Description:** The landing page for the platform where new shops can register and existing Shop Owners can log in to manage their loans and customers.
 
-# View logs
-docker-compose logs -f
-```
+### 2. Customer Portal
+- **Link:** [http://localhost:8080/customer/login](http://localhost:8080/customer/login)
+- **Description:** A dedicated portal for customers (borrowers) to view their active loans and pay their interest dues securely online.
 
-## ☁️ Production Deployment (Railway)
-1. Link your GitHub repository to Railway.
-2. Add a **MySQL** database plugin to your Railway project.
-3. In your Spring Boot service variables, override the placeholders:
-   - `SPRING_PROFILES_ACTIVE=prod`
-   - `MYSQLHOST`, `MYSQLPORT`, `MYSQLDATABASE`, `DB_USERNAME`, `DB_PASSWORD`
-   - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
-   - `MAIL_PASSWORD`
-4. Railway will automatically build the `Dockerfile` and deploy the application.
+### 3. Super Admin Panel
+- **Link:** [http://localhost:8080/admin/login](http://localhost:8080/admin/login)
+- **Description:** The hidden management dashboard for platform administrators to approve new shops and track platform metrics.
+- **Default Credentials:** `admin@trustledger.com` / `Admin@123` *(Auto-generated on startup)*
