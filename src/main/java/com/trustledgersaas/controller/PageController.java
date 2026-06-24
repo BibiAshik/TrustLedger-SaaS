@@ -27,11 +27,11 @@ public class PageController {
     /**
      * Homepage — the landing page with login modal and features.
      * URL: GET /
-     * Template: templates/index.html
+     * Template: templates/public/index.html
      */
     @GetMapping("/")
     public String homePage() {
-        return "index";
+        return "public/index";
     }
 
     /**
