@@ -8,28 +8,33 @@
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/dashboard.css">
 </head>
-<body class="dashboard-body">
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="/images/logo-dark.png" alt="Trust Ledger">
+        </div>
+        <div class="navbar-menu">
+            <button class="btn btn-outline" onclick="logout()">Logout</button>
+        </div>
+    </nav>
 
     <div class="dashboard-layout">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <img src="/images/shop_3d.png" alt="Shop Logo" style="height: 32px; width: auto; object-fit: contain;">
-                    <span id="shopName">Loading...</span>
-                </div>
-            </div>
-            
             <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Overview</div>
                 <a href="/shop/dashboard"><span class="nav-icon">📊</span> Dashboard</a>
                 
                 <div class="sidebar-section-title">Customers</div>
                 <a href="/shop/customers"><span class="nav-icon">👤</span> All Customers</a>
-                <a href="/shop/customers/add"><span class="nav-icon">➕</span> Add Customer</a>
+                <a href="/shop/add-customer"><span class="nav-icon">➕</span> Add Customer</a>
                 
                 <div class="sidebar-section-title">Loans</div>
                 <a href="/shop/loans"><span class="nav-icon">📋</span> All Loans</a>
-                <a href="/shop/loans/new"><span class="nav-icon">✨</span> New Loan</a>
+                <a href="/shop/create-loan"><span class="nav-icon">➕</span> Create Loan</a>
+                <a href="/shop/overdue-loans"><span class="nav-icon">⚠️</span> Overdue Loans</a>
                 
                 <div class="sidebar-section-title">Account</div>
                 <a href="/shop/settings"><span class="nav-icon">⚙️</span> Settings</a>
