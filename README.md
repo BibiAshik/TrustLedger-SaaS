@@ -25,8 +25,9 @@ It provides shop owners with a powerful digital dashboard to manage customers an
 - **Customer Payment Portal:** <br>
 <img width="800" alt="Customer Portal 1" src="https://github.com/user-attachments/assets/3ebbaa37-451d-4557-8b2e-6826c043e67f" /><br><br>
 <img width="800" alt="Customer Portal 2" src="https://github.com/user-attachments/assets/5e34b5ac-4758-4e6a-abe1-49686a761de3" /><br><br>
-<img width="400" alt="Customer Mobile 1" src="https://github.com/user-attachments/assets/abcfbae8-515c-4b07-9210-6027ec9619a3" /> &nbsp;
-<img width="400" alt="Customer Mobile 2" src="https://github.com/user-attachments/assets/7cb40bb4-8672-4042-8606-f68ffe06cf6d" /><br><br>
+<img width="300" alt="Customer Mobile 1" src="https://github.com/user-attachments/assets/abcfbae8-515c-4b07-9210-6027ec9619a3" /> &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img width="300" alt="Customer Mobile 2" src="https://github.com/user-attachments/assets/7cb40bb4-8672-4042-8606-f68ffe06cf6d" /><br><br>
 
 - **Super Admin Panel:** <br>
 <img width="800" alt="Admin Panel" src="https://github.com/user-attachments/assets/dfddb96e-c05e-4391-abf4-710c1f44869a" /><br><br>
